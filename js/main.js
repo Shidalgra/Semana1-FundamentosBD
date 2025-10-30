@@ -1,7 +1,7 @@
 // --- CONFIGURACIÓN DEL CÓDIGO DE ACCESO ---
 const CODIGO_ACCESO = "ALPHA2025";
 
-document.getElementById('btnIngresar').addEventListener('click', () => {
+document.getElementById('btnIngresar')?.addEventListener('click', () => {
   const nombre = document.getElementById('nombre').value.trim();
   const codigo = document.getElementById('codigo').value.trim();
 
@@ -28,7 +28,7 @@ document.getElementById('btnIngresar').addEventListener('click', () => {
 
   Swal.fire({
     icon: 'success',
-    title: 'Bienvenido ' + nombre,
+    title: 'Hola' + nombre,
     text: 'Tu acceso ha sido aprobado.',
     confirmButtonColor: '#004080'
   }).then(() => {
@@ -50,3 +50,55 @@ const firebaseConfig = {
 // Inicializa Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+// --- FUNCIÓN PARA GUARDAR MENSAJES ---
+function guardarMensaje(nombre, mensaje) {
+  return db.collection("mensajes").add({
+    nombre: nombre,
+    mensaje: mensaje,
+    fecha: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+// --- FUNCIÓN PARA MOSTRAR MENSAJES EN TIEMPO REAL ---
+function mostrarMensajes() {
+  const lista = document.getElementById("listaMensajes");
+  if (!lista) return; // Evita error si no está en esta página
+
+  db.collection("mensajes")
+    .orderBy("fecha", "asc")
+    .onSnapshot(snapshot => {
+      lista.innerHTML = "";
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const li = document.createElement("li");
+        const fecha = data.fecha ? data.fecha.toDate().toLocaleString() : "(sin fecha)";
+        li.textContent = `${data.nombre}: ${data.mensaje} — ${fecha}`;
+        lista.appendChild(li);
+      });
+    });
+}
+
+// --- MOSTRAR NOMBRE Y ACTIVAR CHAT ---
+document.addEventListener("DOMContentLoaded", () => {
+  const nombre = localStorage.getItem("nombreEstudiante");
+  const nombreUsuario = document.getElementById("nombreUsuario");
+
+  // Mostrar nombre del usuario si existe
+  if (nombreUsuario && nombre) nombreUsuario.textContent = nombre;
+
+  // Activar chat si existe el formulario
+  const form = document.getElementById("formMensaje");
+  if (form && nombre) {
+    mostrarMensajes();
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const mensaje = document.getElementById("mensaje").value.trim();
+      if (!mensaje) return;
+
+      await guardarMensaje(nombre, mensaje);
+      document.getElementById("mensaje").value = "";
+    });
+  }
+});

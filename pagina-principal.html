@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formación de Grupos - Página Principal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="exam-title">
+    <div class="section-container">
+      <div class="top-bar">
+        <img src="images/LogoFondoBlanco.png" alt="Logo" class="logo-top-left">
+        <h1 class="title">Formación de Grupos</h1>
+      </div>
+      <div class="intento-panel">
+        Página principal del sistema
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="main-content">
+    <section class="bienvenida">
+      <h2>Hola, <span id="nombreUsuario"></span> !!!</h2>
+      <p>Aquí podés escribir y ver mensajes de todos los participantes en tiempo real.</p>
+    </section>
+
+    <!-- Formulario de mensajes -->
+    <section class="mensajes">
+      <form id="formMensaje" class="form-mensaje">
+        <input type="text" id="mensaje" placeholder="Escribe tu mensaje aquí..." required>
+        <button type="submit">Enviar</button>
+      </form>
+
+      <ul id="listaMensajes" class="lista-mensajes"></ul>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="creditos">
+    <p>© 2025 | Sergio Hidalgo Granados — <strong>shidalgra</strong><br>
+      <em>Activando Coeficiente Intelectual</em>
+    </p>
+  </footer>
+
+  <!-- Firebase y Scripts externos -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="js/main.js"></script>
+</body>
+
+</html>
