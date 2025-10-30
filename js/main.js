@@ -1,3 +1,4 @@
+// --- CONFIGURACIÓN DEL CÓDIGO DE ACCESO ---
 const CODIGO_ACCESO = "ALPHA2025";
 
 document.getElementById('btnIngresar').addEventListener('click', () => {
@@ -35,3 +36,17 @@ document.getElementById('btnIngresar').addEventListener('click', () => {
     window.location.href = "pagina-principal.html";
   });
 });
+
+// --- CONFIGURACIÓN DE FIREBASE ---
+const firebaseConfig = {
+  apiKey: "AIzaSyBC2UKajbQh3X1b7qGE0VwIfgx0qUFzkXM",
+  authDomain: "formacion-grupos.firebaseapp.com",
+  projectId: "formacion-grupos",
+  storageBucket: "formacion-grupos.firebasestorage.app",
+  messagingSenderId: "746940037408",
+  appId: "1:746940037408:web:8aaaff3d4a09dc87bbff45"
+};
+
+// Inicializa Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
