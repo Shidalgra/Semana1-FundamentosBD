@@ -1,8 +1,9 @@
-// --- CONFIGURACIÓN DEL CÓDIGO DE ACCESO ---
+// ==========================
+// CONFIGURACIÓN FIREBASE
+// ==========================
 const CODIGO_ESTUDIANTE = "ALPHA2025";
 const CODIGO_ADMIN = "ADMIN2025";
 
-// --- CONFIGURACIÓN DE FIREBASE ---
 const firebaseConfig = {
   apiKey: "AIzaSyBC2UKajbQh3X1b7qGE0VwIfgx0qUFzkXM",
   authDomain: "formacion-grupos.firebaseapp.com",
@@ -12,25 +13,28 @@ const firebaseConfig = {
   appId: "1:746940037408:web:8aaaff3d4a09dc87bbff45"
 };
 
-// Inicializa Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// --- VARIABLES GLOBALES ---
+// ==========================
+// VARIABLES GLOBALES
+// ==========================
 let mensajesCache = [];
+// Al cargar el script, inicializamos tipoUsuario desde localStorage
 let tipoUsuario = localStorage.getItem("tipoUsuario") || "invitado";
 
-// --- FUNCIONES DE CHAT ---
-function guardarMensaje(nombre, mensaje) {
+// ==========================
+// FUNCIONES DE CHAT
+// ==========================
+async function guardarMensaje(nombre, mensaje) {
   return db.collection("mensajes").add({
-    nombre: nombre,
-    mensaje: mensaje,
-    tipoUsuario: tipoUsuario, // 👈 se guarda el tipo (admin, estudiante o invitado)
+    nombre,
+    mensaje,
+    tipoUsuario,
     fecha: firebase.firestore.FieldValue.serverTimestamp()
   });
 }
 
-// Renderizar mensajes con filtro
 function renderizarMensajes(filtro = "") {
   const lista = document.getElementById("listaMensajes");
   if (!lista) return;
@@ -39,15 +43,14 @@ function renderizarMensajes(filtro = "") {
   const filtroLower = filtro.toLowerCase();
 
   mensajesCache.forEach(msg => {
-    const texto = `${msg.nombre}: ${msg.mensaje}`.toLowerCase();
-    if (!texto.includes(filtroLower)) return;
+    if (!(`${msg.nombre}: ${msg.mensaje}`.toLowerCase().includes(filtroLower))) return;
 
     const li = document.createElement("li");
     li.classList.add("mensaje-item");
-
     const fecha = msg.fecha ? msg.fecha.toDate().toLocaleString() : "(sin fecha)";
     li.innerHTML = `<strong>${msg.nombre}:</strong> ${msg.mensaje}<br><small>${fecha}</small>`;
 
+    // Solo admin puede borrar mensajes individuales
     if (tipoUsuario === "admin") {
       const btnBorrar = document.createElement("button");
       btnBorrar.textContent = "🗑️";
@@ -62,15 +65,9 @@ function renderizarMensajes(filtro = "") {
           cancelButtonText: "Cancelar",
           confirmButtonColor: "#d33"
         });
-
         if (confirm.isConfirmed) {
           await db.collection("mensajes").doc(msg.id).delete();
-          Swal.fire({
-            icon: "success",
-            title: "Mensaje eliminado",
-            timer: 1500,
-            showConfirmButton: false
-          });
+          Swal.fire({ icon: "success", title: "Mensaje eliminado", timer: 1500, showConfirmButton: false });
         }
       };
       li.appendChild(btnBorrar);
@@ -80,18 +77,16 @@ function renderizarMensajes(filtro = "") {
   });
 }
 
-// Escuchar mensajes en tiempo real
 function mostrarMensajes() {
   const lista = document.getElementById("listaMensajes");
   if (!lista) return;
 
-  // Mostrar sección admin
+  // Se asegura de que las acciones de administración se muestren solo si es admin
   if (tipoUsuario === "admin") {
     const accionesAdmin = document.getElementById("accionesAdmin");
     if (accionesAdmin) accionesAdmin.style.display = "block";
 
-    const btnBorrarTodos = document.getElementById("btnBorrarTodos");
-    btnBorrarTodos?.addEventListener("click", async () => {
+    document.getElementById("btnBorrarTodos")?.addEventListener("click", async () => {
       const confirm = await Swal.fire({
         icon: "warning",
         title: "¿Borrar todos los mensajes?",
@@ -107,13 +102,7 @@ function mostrarMensajes() {
         const batch = db.batch();
         snapshot.forEach(doc => batch.delete(doc.ref));
         await batch.commit();
-
-        Swal.fire({
-          icon: "success",
-          title: "Todos los mensajes han sido eliminados",
-          timer: 1500,
-          showConfirmButton: false
-        });
+        Swal.fire({ icon: "success", title: "Todos los mensajes eliminados", timer: 1500, showConfirmButton: false });
       }
     });
   }
@@ -121,19 +110,76 @@ function mostrarMensajes() {
   db.collection("mensajes")
     .orderBy("fecha", "asc")
     .onSnapshot(snapshot => {
-      mensajesCache = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      const filtroActual = document.getElementById('busquedaMensajes')?.value || "";
-      renderizarMensajes(filtroActual);
+      mensajesCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderizarMensajes(document.getElementById('busquedaMensajes')?.value || "");
     });
 }
 
-// --- BOTÓN SALIR ---
+// ==========================
+// FUNCIONES DE USUARIOS
+// ==========================
+function registrarUsuario(nombre) {
+  if (!nombre || !tipoUsuario) return;
+  const usuarioRef = db.collection("usuariosConectados").doc(nombre);
+  usuarioRef.set({
+    nombre,
+    tipoUsuario,
+    conectado: true,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  window.addEventListener("beforeunload", () => {
+    usuarioRef.update({ conectado: false });
+  });
+}
+
+// ==========================
+// LOGIN
+// ==========================
+document.getElementById('btnIngresar')?.addEventListener('click', () => {
+  const nombre = document.getElementById('nombre').value.trim();
+  const codigo = document.getElementById('codigo').value.trim();
+
+  const palabras = nombre.split(" ").filter(p => p.length > 0);
+  if (palabras.length < 3 || !palabras.every(p => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]{3,10}$/.test(p))) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Nombre inválido',
+      html: 'Debes usar al menos 3 palabras de 3-10 letras cada una.',
+      confirmButtonColor: '#004080'
+    });
+    return;
+  }
+
+  // Determinar tipo de usuario
+  if (codigo === CODIGO_ADMIN) tipoUsuario = "admin";
+  else if (codigo === CODIGO_ESTUDIANTE) tipoUsuario = "invitado";
+  else {
+    Swal.fire({
+      icon: 'error',
+      title: 'Código incorrecto',
+      text: 'Verifica con el profesor el código.',
+      confirmButtonColor: '#004080'
+    });
+    return;
+  }
+
+  localStorage.setItem("nombreEstudiante", nombre);
+  localStorage.setItem("tipoUsuario", tipoUsuario);
+
+  Swal.fire({
+    icon: 'success',
+    title: `Bienvenido ${nombre}`,
+    text: `Has ingresado como ${tipoUsuario}.`,
+    confirmButtonColor: '#004080'
+  }).then(() => window.location.href = "pagina-principal.html");
+});
+
+// ==========================
+// BOTÓN SALIR
+// ==========================
 function activarBotonSalir() {
-  const btnSalir = document.getElementById("btnSalir");
-  btnSalir?.addEventListener("click", () => {
+  document.getElementById("btnSalir")?.addEventListener("click", () => {
     Swal.fire({
       icon: "question",
       title: "¿Deseas salir?",
@@ -141,7 +187,7 @@ function activarBotonSalir() {
       confirmButtonText: "Sí, salir",
       cancelButtonText: "Cancelar",
       confirmButtonColor: "#d33"
-    }).then((result) => {
+    }).then(result => {
       if (result.isConfirmed) {
         localStorage.removeItem("nombreEstudiante");
         localStorage.removeItem("tipoUsuario");
@@ -151,108 +197,24 @@ function activarBotonSalir() {
   });
 }
 
-// --- BOTÓN INGRESAR ---
-document.getElementById('btnIngresar')?.addEventListener('click', () => {
-  const nombre = document.getElementById('nombre').value.trim();
-  const codigo = document.getElementById('codigo').value.trim();
-
-  const palabras = nombre.split(" ").filter(p => p.length > 0);
-  const nombreValido = palabras.length >= 3 && palabras.every(p => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]{3,10}$/.test(p));
-
-  if (!nombreValido) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Nombre inválido',
-      html: 'El nombre debe tener al menos 3 palabras, cada palabra entre 3 y 10 letras,<br>solo letras, sin números ni caracteres especiales.',
-      confirmButtonText: 'Entendido',
-      confirmButtonColor: '#004080'
-    });
-    return;
-  }
-
-  tipoUsuario = "invitado";
-  if (codigo === CODIGO_ADMIN) tipoUsuario = "admin";
-  else if (codigo === CODIGO_ESTUDIANTE) tipoUsuario = "estudiante";
-  else {
-    Swal.fire({
-      icon: 'error',
-      title: 'Código incorrecto',
-      text: 'Verifica con el profesor el código de acceso.',
-      confirmButtonColor: '#004080'
-    });
-    return;
-  }
-
-  Swal.fire({
-    icon: 'success',
-    title: `Bienvenido ${nombre}`,
-    text: `Has ingresado como ${tipoUsuario}.`,
-    confirmButtonColor: '#004080'
-  }).then(() => {
-    localStorage.setItem("nombreEstudiante", nombre);
-    localStorage.setItem("tipoUsuario", tipoUsuario);
-    window.location.href = "pagina-principal.html";
-  });
+// ==========================
+// FILTRO DE MENSAJES
+// ==========================
+document.getElementById('busquedaMensajes')?.addEventListener('input', e => {
+  renderizarMensajes(e.target.value.toLowerCase());
 });
 
-// --- INICIALIZACIÓN ---
-document.addEventListener("DOMContentLoaded", () => {
-  const nombre = localStorage.getItem("nombreEstudiante");
-  const nombreUsuario = document.getElementById("nombreUsuario");
-
-  if (nombreUsuario && nombre) nombreUsuario.textContent = nombre;
-
-  const form = document.getElementById("formMensaje");
-  if (form && nombre) {
-    mostrarMensajes();
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const mensaje = document.getElementById("mensaje").value.trim();
-      if (!mensaje) return;
-
-      await guardarMensaje(nombre, mensaje);
-      document.getElementById("mensaje").value = "";
-    });
-  }
-
-  activarBotonSalir();
-
-  // --- REGISTRO DE USUARIO EN FIRESTORE ---
-  if (nombre && tipoUsuario) {
-    const usuarioRef = db.collection("usuariosConectados").doc(nombre);
-
-    usuarioRef.set({
-      nombre: nombre,
-      tipoUsuario: tipoUsuario,
-      conectado: true,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    // Al salir o cerrar pestaña, marcar desconectado
-    window.addEventListener("beforeunload", () => {
-      usuarioRef.update({ conectado: false });
-    });
-  }
-});
-
-// --- FILTRO DE MENSAJES ---
-const inputBusqueda = document.getElementById('busquedaMensajes');
-if (inputBusqueda) {
-  inputBusqueda.addEventListener('input', (e) => {
-    const filtro = e.target.value.trim().toLowerCase();
-    renderizarMensajes(filtro);
-  });
-}
-
-document.getElementById('btnGenerarGrupos')?.addEventListener('click', async () => {
-  const personasPorGrupo = parseInt(document.getElementById('personasPorGrupo').value);
-  if (!personasPorGrupo || personasPorGrupo < 1) {
+// ==========================
+// GENERACIÓN DE GRUPOS (EXCLUSIVA ADMIN)
+// ==========================
+async function generarGruposAleatorios() {
+  // **VALIDACIÓN CLAVE:** Solo admin puede ejecutar la generación
+  if (tipoUsuario !== "admin") {
     Swal.fire({
-      icon: 'warning',
-      title: 'Número inválido',
-      text: 'Debes indicar un número válido de personas por grupo.',
-      confirmButtonColor: '#004080'
+      icon: "error",
+      title: "Acceso denegado",
+      text: "Solo administradores pueden generar grupos.",
+      confirmButtonColor: "#004080"
     });
     return;
   }
@@ -265,39 +227,131 @@ document.getElementById('btnGenerarGrupos')?.addEventListener('click', async () 
 
   if (invitados.length === 0) {
     Swal.fire({
-      icon: 'info',
-      title: 'No hay invitados conectados',
-      text: 'Aún no hay participantes conectados para formar grupos.',
-      confirmButtonColor: '#004080'
+      icon: "info",
+      title: "No hay invitados conectados",
+      text: "No hay participantes para formar grupos.",
+      confirmButtonColor: "#004080"
     });
     return;
   }
 
-  // Mezclar invitados aleatoriamente
-  const shuffled = invitados.sort(() => 0.5 - Math.random());
-
-  const grupos = {};
-  const nombresGrupos = ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta"];
-  let indexGrupo = 0;
-
-  for (let i = 0; i < shuffled.length; i += personasPorGrupo) {
-    const grupoNombre = nombresGrupos[indexGrupo] || `Grupo ${indexGrupo + 1}`;
-    grupos[grupoNombre] = shuffled.slice(i, i + personasPorGrupo);
-    indexGrupo++;
-  }
-
-  // Mostrar los grupos en el modal
-  const listaGruposModal = document.getElementById('listaGruposModal');
-  listaGruposModal.innerHTML = "";
-  for (const [nombre, integrantes] of Object.entries(grupos)) {
-    const div = document.createElement('div');
-    div.innerHTML = `<strong>${nombre}:</strong><br>${integrantes.join('<br>')}`;
-    listaGruposModal.appendChild(div);
-  }
-
   Swal.fire({
-    title: 'Grupos generados exitosamente',
-    icon: 'success',
-    confirmButtonColor: '#004080'
+    title: "¿Número de personas por grupo?",
+    input: "number",
+    inputAttributes: { min: 1, step: 1 },
+    inputPlaceholder: "Ej: 3",
+    showCancelButton: true,
+    confirmButtonText: "Generar",
+    cancelButtonText: "Cancelar",
+    preConfirm: num => (!num || num < 1) ? Swal.showValidationMessage("Número inválido") : parseInt(num)
+  }).then(result => {
+    if (!result.isConfirmed) return;
+
+    const n = result.value;
+    const shuffled = invitados.sort(() => Math.random() - 0.5);
+    const nombresGrupos = ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta"];
+    const grupos = {};
+
+    for (let i = 0, idx = 0; i < shuffled.length; i += n) {
+      const nombreGrupo = nombresGrupos[idx] || `Grupo ${idx + 1}`;
+      grupos[nombreGrupo] = shuffled.slice(i, i + n);
+      idx++;
+    }
+
+    const listaModal = document.getElementById("listaGruposModal");
+    listaModal.innerHTML = "";
+    for (const [nombre, miembros] of Object.entries(grupos)) {
+      const div = document.createElement("div");
+      div.innerHTML = `<h3>${nombre}</h3><ul>${miembros.map(m => `<li>${m}</li>`).join("")}</ul>`;
+      listaModal.appendChild(div);
+    }
+
+    Swal.fire({ icon: "success", title: "Grupos generados", timer: 1500, showConfirmButton: false });
+
+    // Abre el modal para que el admin vea los grupos recién creados
+    document.getElementById("modalGrupos").style.display = "flex";
+
   });
+}
+
+// ==========================
+// FUNCIÓN PARA MOSTRAR GRUPOS (PARA TODOS)
+// ==========================
+function mostrarGrupos() {
+  // Esta función solo se encarga de mostrar el modal con los resultados ya cargados
+  const listaModal = document.getElementById("listaGruposModal");
+
+  // Lógica para manejar el caso donde aún no hay grupos (si no se cargan de Firebase)
+  if (!listaModal || listaModal.children.length === 0) {
+    Swal.fire({
+      icon: "info",
+      title: "Grupos aún no disponibles",
+      text: "El administrador debe generar los grupos primero.",
+      confirmButtonColor: "#004080"
+    });
+    return;
+  }
+
+  // Si hay contenido (asumiendo que se cargará al iniciar o después de generar), muestra el modal
+  document.getElementById("modalGrupos").style.display = "flex";
+}
+
+
+// ==========================
+// MODAL DE GRUPOS
+// ==========================
+const modalGrupos = document.getElementById("modalGrupos");
+
+// btnVerGrupos (Header) llama a mostrarGrupos() para que sea accesible para todos.
+document.getElementById("btnVerGrupos")?.addEventListener("click", mostrarGrupos);
+
+
+// btnGenerarGrupos (Chat) llama a generarGruposAleatorios() (solo admin pasa la validación interna).
+document.getElementById("btnGenerarGrupos")?.addEventListener("click", generarGruposAleatorios);
+
+
+document.querySelector(".close-modal")?.addEventListener("click", () => modalGrupos.style.display = "none");
+window.addEventListener("click", e => { if (e.target === modalGrupos) modalGrupos.style.display = "none"; });
+
+// ==========================
+// INICIALIZACIÓN
+// ==========================
+document.addEventListener("DOMContentLoaded", () => {
+  const nombre = localStorage.getItem("nombreEstudiante");
+  const userType = localStorage.getItem("tipoUsuario");
+
+  if (nombre && userType) {
+    const nombreUsuario = document.getElementById("nombreUsuario");
+    if (nombreUsuario) nombreUsuario.textContent = nombre;
+
+    mostrarMensajes();
+    activarBotonSalir();
+    registrarUsuario(nombre);
+
+    const form = document.getElementById("formMensaje");
+    form?.addEventListener("submit", async e => {
+      e.preventDefault();
+      const mensaje = document.getElementById("mensaje").value.trim();
+      if (!mensaje) return;
+      await guardarMensaje(nombre, mensaje);
+      document.getElementById("mensaje").value = "";
+    });
+
+    // 🛑 Lógica de Ocultamiento: Solo ocultamos btnGenerarGrupos para invitados
+    const btnGenerarGrupos = document.getElementById("btnGenerarGrupos"); // Botón en el chat
+
+    if (userType !== "admin") {
+
+      // Ocultar SOLO btnGenerarGrupos (el que inicia el proceso)
+      if (btnGenerarGrupos) {
+        btnGenerarGrupos.classList.add("oculto-admin");
+      }
+    } else {
+      // Si es admin, asegurar que los botones de generación estén visibles
+      if (btnGenerarGrupos) {
+        btnGenerarGrupos.classList.remove("oculto-admin");
+        btnGenerarGrupos.style.display = "inline-block";
+      }
+    }
+  }
 });

@@ -13,23 +13,26 @@
 </head>
 
 <body>
-  <!-- Botón Ver Grupos arriba -->
-  <div id="accionesUsuario">
-    <button id="btnVerGrupos">Ver Grupos</button>
-  </div>
-  <!-- Header -->
   <header class="exam-title">
-    <div class="section-container">
+    <!-- Botón Ver Grupos arriba -->
+    <div class="contenedor-accionesUsuario">
+      <div id="accionesUsuario">
+        <button id="btnVerGrupos">Ver Grupos</button>
+      </div>
+    </div>
+    
+    <!-- Header -->
+    <div class="contendor-logoNombre">
       <div class="top-bar">
         <img src="images/LogoFondoBlanco.png" alt="Logo" class="logo-top-left">
         <h1 class="title">Formación de Grupos</h1>
       </div>
-      <div class="intento-panel">
-        Buscar:
-      </div>
-      <input type="text" id="busquedaMensajes" placeholder="Buscar mensajes..." class="input-busqueda">
     </div>
-
+    
+    <div class="contenedor-busqueda">
+      <label for="busquedaMensajes" class="lbl-buscar">Buscar:</label>
+      <input type="text" id="busquedaMensajes" placeholder="Buscar..." class="input-busqueda" />
+    </div>
   </header>
 
   <!-- Main content -->
@@ -65,22 +68,22 @@
     </div>
   </div>
 
-  <!-- Botón Salir abajo -->
-  <div id="botonSalirAbajo">
-    <button id="btnSalir">Salir</button>
-  </div>
+
   <!-- Footer -->
   <footer class="creditos">
     <p>© 2025 | Sergio Hidalgo Granados — <strong>shidalgra</strong><br>
       <em>Activando Coeficiente Intelectual</em>
     </p>
+    <!-- Botón Salir abajo -->
+    <div id="botonSalirAbajo">
+      <button id="btnSalir">Salir</button>
+    </div>
   </footer>
 
   <!-- Firebase y Scripts -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="js/main.js"></script>
-  <script src="js/gruposModal.js"></script>
 </body>
 
 </html>

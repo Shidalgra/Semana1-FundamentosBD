@@ -20,17 +20,22 @@ body {
   align-items: center;
 }
 
+.oculto-admin {
+    display: none !important;
+}
+
 /* CABECERA */
 .exam-title {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  flex-direction: row;
   width: 100%;
   background-color: #072D4E;
   color: white;
   padding: 20px 0;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  align-content: space-around;
+  align-items: flex-start;
+  justify-content: center;
 }
 
 .exam-title .title {
@@ -70,6 +75,14 @@ body {
   font-weight: 700;
 }
 
+.bienvenida h2 {
+  margin-top: 15px;
+}
+
+.bienvenida p {
+  margin-top: 10px;
+}
+
 label {
   display: block;
   text-align: left;
@@ -87,6 +100,64 @@ input {
   box-shadow: inset 4px 4px 8px #d9dde3, inset -4px -4px 8px #ffffff;
   background-color: #f7f9fb;
   font-size: 1rem;
+}
+
+.contenedor-busqueda{
+  position: absolute;
+  right: 15px;
+  display: flex;
+}
+
+.lbl-buscar{
+  color: #fff;
+  margin-right: 10px;
+}
+
+input:focus,
+textarea:focus,
+.input-busqueda:focus {
+  outline: none;
+  /* elimina el borde de focus */
+  border: 2px solid #c8bc16;
+  /* si quieres un borde personalizado */
+}
+
+.input-busqueda {
+  width: 200px;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+#btnVerGrupos {
+  position: absolute;
+  left: 15px;
+  background-color: #004080;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s ease-in-out, transform 0.2s;
+  z-index: 1000;
+  /* 👈 asegura que siempre quede visible */
+  box-shadow: 0.15px 0.15px 10px rgba(146, 149, 155, 0.6),
+    -0.15px -0.15px 10px rgba(151, 151, 151, 0.4);
+}
+
+#btnVerGrupos:hover {
+  background-color: #0066cc;
+  transform: scale(1.05);
+  box-shadow: 0.1px 0.1px 20px rgba(143, 146, 152, 0.6),
+    -0.1px -0.1px 20px rgba(123, 120, 120, 0.4);
+}
+
+#btnVerGrupos:active {
+  background-color: #0066cc;
+  transform: scale(0.9);
 }
 
 .submit {
@@ -201,7 +272,8 @@ input {
 
 /* Botón de borrar todos los mensajes */
 .btn-borrar-todos {
-  background-color: #d33;  /* rojo fuerte */
+  background-color: #d33;
+  /* rojo fuerte */
   margin-bottom: 2%;
   color: white;
   padding: 12px 25px;
@@ -225,38 +297,6 @@ input {
   transform: scale(0.95);
 }
 
-
-
-#btnVerGrupos {
-  position: absolute;
-  right: 15px;
-  top: 10px;
-  background-color: #004080;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 10px 20px;
-  cursor: pointer;
-  font-weight: bold;
-  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.2s ease-in-out, transform 0.2s;
-  z-index: 1000;
-  /* 👈 asegura que siempre quede visible */
-  box-shadow: 0.15px 0.15px 10px rgba(146, 149, 155, 0.6),
-    -0.15px -0.15px 10px rgba(151, 151, 151, 0.4);
-}
-
-#btnVerGrupos:hover {
-  background-color: #0066cc;
-  transform: scale(1.05);
-  box-shadow: 0.1px 0.1px 20px rgba(143, 146, 152, 0.6),
-    -0.1px -0.1px 20px rgba(123, 120, 120, 0.4);
-}
-
-#btnVerGrupos:active {
-  background-color: #0066cc;
-  transform: scale(0.9);
-}
 
 /* --- BOTÓN SALIR --- */
 #btnSalir {
@@ -287,16 +327,6 @@ input {
 #btnSalir:active {
   background-color: #0066cc;
   transform: scale(0.9);
-}
-
-
-
-.input-busqueda {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
 }
 
 /* Contenedor principal de grupos */
@@ -345,6 +375,8 @@ input {
 }
 
 #btnGenerarGrupos {
+  margin-top: 15px;
+  margin-bottom: 15%;
   right: 15px;
   bottom: 10px;
   background-color: #004080;
