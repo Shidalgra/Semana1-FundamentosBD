@@ -7,7 +7,8 @@
   font-family: 'Titillium Web', sans-serif;
 }
 
-html, body {
+html,
+body {
   min-height: 100vh;
 }
 
@@ -29,7 +30,7 @@ body {
   background-color: #072D4E;
   color: white;
   padding: 20px 0;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .exam-title .title {
@@ -89,7 +90,7 @@ input {
 }
 
 button {
-  margin-top: 20px;
+  margin-top: 2%;
   background-color: #004080;
   color: white;
   border: none;
@@ -98,23 +99,12 @@ button {
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
-  box-shadow: 6px 6px 12px #c5c9d1, -6px -6px 12px #ffffff;
+  box-shadow: 0.2px 0.2px 30px #c5c9d1, -0.2px -0.2px 15px #ffffff;
 }
 
 button:hover {
   background-color: #0056b3;
-  box-shadow: 2px 2px 6px #0066cc, -2px -2px 6px #ffffff;
-}
-
-/* RESPONSIVE */
-@media (max-width: 600px) {
-  .login-box {
-    padding: 20px;
-  }
-
-  .exam-title .title {
-    font-size: 1.3rem;
-  }
+  box-shadow: 2px 2px 6px #ffffff, -2px -2px 6px #ffffff;
 }
 
 /* ====== Footer Mejorado ====== */
@@ -122,13 +112,17 @@ button:hover {
   width: 100%;
   text-align: center;
   font-size: 0.95em;
-  color: #f0f0f0;               /* texto claro */
-  background: #111;             /* fondo oscuro */
+  color: #f0f0f0;
+  /* texto claro */
+  background: #111;
+  /* fondo oscuro */
   padding: 15px 10px;
   margin-top: auto;
-  border-top: 2px solid #333;   /* línea sutil arriba */
+  border-top: 2px solid #333;
+  /* línea sutil arriba */
   position: relative;
-  bottom: 0;           /* que se quede abajo del contenido */
+  bottom: 0;
+  /* que se quede abajo del contenido */
 }
 
 .creditos p {
@@ -137,11 +131,159 @@ button:hover {
 }
 
 .creditos strong {
-  color: #4FC3F7;               /* un azul brillante */
+  color: #4FC3F7;
+  /* un azul brillante */
   font-weight: 600;
 }
 
 .creditos em {
   color: #aaa;
   font-style: italic;
+}
+
+.lista-mensajes {
+  list-style: none;
+  padding: 0;
+}
+
+.mensaje-item {
+  background: #fff;
+  margin: 8px 0;
+  padding: 10px 15px;
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative;
+  line-height: 1.4;
+}
+
+.btn-borrar {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 0.9em;
+  display: none;
+  /* oculto por defecto */
+  transition: 0.2s;
+}
+
+.mensaje-item:hover .btn-borrar {
+  display: inline-block;
+  /* aparece al pasar el mouse */
+}
+
+.btn-borrar:hover {
+  background: #d63333;
+}
+
+.acciones-admin {
+  text-align: center;
+  margin: 20px 0;
+  display: none;
+  /* se muestra solo si es admin */
+}
+
+/* Botón de borrar todos los mensajes */
+.btn-borrar-todos {
+  background-color: #d33;
+  /* rojo fuerte */
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2), -4px -4px 10px #ffffff;
+}
+
+.btn-borrar-todos:hover {
+  background-color: #ff4d4d;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3), -2px -2px 6px #ffffff;
+}
+
+#accionesUsuario {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+}
+
+#btnSalir {
+  position: fixed;
+  right: 5%;
+  top: 2%;
+  background-color: #004080;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+#btnSalir:hover {
+  background-color: #0066cc;
+}
+
+.input-busqueda {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* Contenedor principal de grupos */
+#contenedorGrupos {
+  float: right;
+  width: 30%;
+  border-left: 2px solid #ccc;
+  padding-left: 15px;
+  max-height: 80vh;
+  /* Altura máxima para scroll */
+  overflow-y: auto;
+  background-color: #f9f9f9;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
+  padding-top: 10px;
+}
+
+/* Título de la sección */
+#contenedorGrupos h3 {
+  font-family: 'Arial', sans-serif;
+  color: #004080;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+/* Cada grupo */
+#listaGrupos div {
+  background-color: #e6f0ff;
+  border: 1px solid #004080;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  font-family: 'Arial', sans-serif;
+  transition: transform 0.2s;
+}
+
+/* Efecto hover en grupo */
+#listaGrupos div:hover {
+  transform: scale(1.02);
+  background-color: #cce0ff;
+}
+
+/* Nombre del grupo */
+#listaGrupos div strong {
+  color: #004080;
+  font-size: 1.1em;
+}
+
+/* Botón de generar grupos */
+#btnGenerarGrupos {
+  background-color: #004080;
+  color: #fff;
 }
