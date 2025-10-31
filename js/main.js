@@ -25,6 +25,7 @@ function guardarMensaje(nombre, mensaje) {
   return db.collection("mensajes").add({
     nombre: nombre,
     mensaje: mensaje,
+    tipoUsuario: tipoUsuario, // 👈 se guarda el tipo (admin, estudiante o invitado)
     fecha: firebase.firestore.FieldValue.serverTimestamp()
   });
 }
@@ -216,6 +217,23 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   activarBotonSalir();
+
+  // --- REGISTRO DE USUARIO EN FIRESTORE ---
+  if (nombre && tipoUsuario) {
+    const usuarioRef = db.collection("usuariosConectados").doc(nombre);
+
+    usuarioRef.set({
+      nombre: nombre,
+      tipoUsuario: tipoUsuario,
+      conectado: true,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Al salir o cerrar pestaña, marcar desconectado
+    window.addEventListener("beforeunload", () => {
+      usuarioRef.update({ conectado: false });
+    });
+  }
 });
 
 // --- FILTRO DE MENSAJES ---
@@ -239,45 +257,47 @@ document.getElementById('btnGenerarGrupos')?.addEventListener('click', async () 
     return;
   }
 
-  // Obtener todos los estudiantes desde Firebase
-  const snapshot = await db.collection("mensajes").get();
-  const estudiantes = snapshot.docs
+  const snapshot = await db.collection("usuariosConectados").get();
+  const invitados = snapshot.docs
     .map(doc => doc.data())
-    .filter(u => u.tipoUsuario === "estudiante")
+    .filter(u => u.tipoUsuario === "invitado" && u.conectado)
     .map(u => u.nombre);
 
-  if (estudiantes.length === 0) {
+  if (invitados.length === 0) {
     Swal.fire({
       icon: 'info',
-      title: 'No hay estudiantes',
-      text: 'No hay estudiantes registrados para generar grupos.',
+      title: 'No hay invitados conectados',
+      text: 'Aún no hay participantes conectados para formar grupos.',
       confirmButtonColor: '#004080'
     });
     return;
   }
 
-  // Mezclar estudiantes aleatoriamente
-  const shuffled = estudiantes.sort(() => 0.5 - Math.random());
+  // Mezclar invitados aleatoriamente
+  const shuffled = invitados.sort(() => 0.5 - Math.random());
 
-  // Crear grupos
   const grupos = {};
-  const nombresGrupos = ["Alpha","Beta","Gama","Delta","Epsilon","Zeta","Eta","Theta"];
+  const nombresGrupos = ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta"];
   let indexGrupo = 0;
 
   for (let i = 0; i < shuffled.length; i += personasPorGrupo) {
-    const grupoNombre = nombresGrupos[indexGrupo] || `Grupo ${indexGrupo+1}`;
+    const grupoNombre = nombresGrupos[indexGrupo] || `Grupo ${indexGrupo + 1}`;
     grupos[grupoNombre] = shuffled.slice(i, i + personasPorGrupo);
     indexGrupo++;
   }
 
-  // Mostrar los grupos
-  const contenedor = document.getElementById('listaGrupos');
-  contenedor.innerHTML = "";
+  // Mostrar los grupos en el modal
+  const listaGruposModal = document.getElementById('listaGruposModal');
+  listaGruposModal.innerHTML = "";
   for (const [nombre, integrantes] of Object.entries(grupos)) {
     const div = document.createElement('div');
-    div.style.marginBottom = "10px";
-    div.innerHTML = `<strong>${nombre}:</strong> <br> ${integrantes.join("<br>")}`;
-    contenedor.appendChild(div);
+    div.innerHTML = `<strong>${nombre}:</strong><br>${integrantes.join('<br>')}`;
+    listaGruposModal.appendChild(div);
   }
-});
 
+  Swal.fire({
+    title: 'Grupos generados exitosamente',
+    icon: 'success',
+    confirmButtonColor: '#004080'
+  });
+});

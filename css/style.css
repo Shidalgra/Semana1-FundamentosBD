@@ -89,22 +89,33 @@ input {
   font-size: 1rem;
 }
 
-button {
-  margin-top: 2%;
+.submit {
+  right: 15px;
+  margin-top: 20px;
   background-color: #004080;
   color: white;
   border: none;
-  padding: 12px 25px;
-  border-radius: 8px;
-  font-weight: bold;
+  border-radius: 10px;
+  padding: 10px 20px;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0.2px 0.2px 30px #c5c9d1, -0.2px -0.2px 15px #ffffff;
+  font-weight: bold;
+  transition: background-color 0.2s ease-in-out, transform 0.2s;
+  z-index: 1000;
+  /* 👈 asegura que siempre quede visible */
+  box-shadow: 0.15px 0.15px 10px rgba(4, 46, 129, 0.6),
+    -0.15px -0.15px 10px rgba(4, 46, 129, 0.4);
 }
 
-button:hover {
-  background-color: #0056b3;
-  box-shadow: 2px 2px 6px #ffffff, -2px -2px 6px #ffffff;
+.submit:hover {
+  background-color: #0066cc;
+  transform: scale(1.05);
+  box-shadow: 0.1px 0.1px 20px rgba(4, 46, 129, 0.6),
+    -0.1px -0.1px 20px rgba(4, 46, 129, 0.4);
+}
+
+.submit:active {
+  background-color: #0066cc;
+  transform: scale(0.9);
 }
 
 /* ====== Footer Mejorado ====== */
@@ -190,8 +201,8 @@ button:hover {
 
 /* Botón de borrar todos los mensajes */
 .btn-borrar-todos {
-  background-color: #d33;
-  /* rojo fuerte */
+  background-color: #d33;  /* rojo fuerte */
+  margin-bottom: 2%;
   color: white;
   padding: 12px 25px;
   border: none;
@@ -205,29 +216,80 @@ button:hover {
 .btn-borrar-todos:hover {
   background-color: #ff4d4d;
   box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3), -2px -2px 6px #ffffff;
+  transform: scale(1.05);
 }
 
-#accionesUsuario {
+.btn-borrar-todos:active {
+  background-color: #ff4d4d;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3), -2px -2px 6px #ffffff;
+  transform: scale(0.95);
+}
+
+
+
+#btnVerGrupos {
   position: absolute;
-  top: 15px;
-  right: 20px;
-}
-
-#btnSalir {
-  position: fixed;
-  right: 5%;
-  top: 2%;
+  right: 15px;
+  top: 10px;
   background-color: #004080;
   color: white;
   border: none;
   border-radius: 5px;
-  padding: 5px 10px;
+  padding: 10px 20px;
   cursor: pointer;
+  font-weight: bold;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s ease-in-out, transform 0.2s;
+  z-index: 1000;
+  /* 👈 asegura que siempre quede visible */
+  box-shadow: 0.15px 0.15px 10px rgba(146, 149, 155, 0.6),
+    -0.15px -0.15px 10px rgba(151, 151, 151, 0.4);
+}
+
+#btnVerGrupos:hover {
+  background-color: #0066cc;
+  transform: scale(1.05);
+  box-shadow: 0.1px 0.1px 20px rgba(143, 146, 152, 0.6),
+    -0.1px -0.1px 20px rgba(123, 120, 120, 0.4);
+}
+
+#btnVerGrupos:active {
+  background-color: #0066cc;
+  transform: scale(0.9);
+}
+
+/* --- BOTÓN SALIR --- */
+#btnSalir {
+  position: absolute;
+  right: 15px;
+  bottom: 10px;
+  background-color: #004080;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease-in-out, transform 0.2s;
+  z-index: 1000;
+  /* 👈 asegura que siempre quede visible */
+  box-shadow: 0.15px 0.15px 10px rgba(146, 149, 155, 0.6),
+    -0.15px -0.15px 10px rgba(151, 151, 151, 0.4);
 }
 
 #btnSalir:hover {
   background-color: #0066cc;
+  transform: scale(1.05);
+  box-shadow: 0.1px 0.1px 20px rgba(143, 146, 152, 0.6),
+    -0.1px -0.1px 20px rgba(123, 120, 120, 0.4);
 }
+
+#btnSalir:active {
+  background-color: #0066cc;
+  transform: scale(0.9);
+}
+
+
 
 .input-busqueda {
   width: 100%;
@@ -282,8 +344,105 @@ button:hover {
   font-size: 1.1em;
 }
 
-/* Botón de generar grupos */
 #btnGenerarGrupos {
+  right: 15px;
+  bottom: 10px;
   background-color: #004080;
-  color: #fff;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease-in-out, transform 0.2s;
+  z-index: 1000;
+  /* 👈 asegura que siempre quede visible */
+  box-shadow: 0.15px 0.15px 10px rgba(4, 46, 129, 0.6),
+    -0.15px -0.15px 10px rgba(4, 46, 129, 0.4);
+}
+
+#btnGenerarGrupos:hover {
+  background-color: #0066cc;
+  transform: scale(1.05);
+  box-shadow: 0.1px 0.1px 20px rgba(4, 46, 129, 0.6),
+    -0.1px -0.1px 20px rgba(4, 46, 129, 0.4);
+}
+
+#btnGenerarGrupos:active {
+  background-color: #0066cc;
+  transform: scale(0.9);
+}
+
+/* ====== MODAL DE GRUPOS ====== */
+.modal {
+  display: none;
+  /* oculto por defecto */
+  position: fixed;
+  bottom: 80px;
+  /* 👈 un poco arriba del botón salir */
+  right: 100px;
+  /* 👈 hacia la izquierda desde el borde derecho */
+  z-index: 999;
+  background-color: rgba(0, 0, 0, 0.3);
+  width: 100%;
+  height: 100%;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  width: 300px;
+  max-height: 60vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  position: absolute;
+  bottom: 80px;
+  right: 40px;
+  animation: aparecer 0.25s ease-in-out;
+}
+
+/* Animación suave */
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Botón cerrar */
+.close-modal {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 1.5em;
+  color: #333;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.close-modal:hover {
+  color: #d33;
+}
+
+/* Estilo del contenido interno del modal */
+#listaGruposModal div {
+  background-color: #e6f0ff;
+  border: 1px solid #004080;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  transition: 0.2s;
+}
+
+#listaGruposModal div:hover {
+  transform: scale(1.02);
+  background-color: #cce0ff;
 }

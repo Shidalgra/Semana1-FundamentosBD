@@ -13,6 +13,10 @@
 </head>
 
 <body>
+  <!-- Botón Ver Grupos arriba -->
+  <div id="accionesUsuario">
+    <button id="btnVerGrupos">Ver Grupos</button>
+  </div>
   <!-- Header -->
   <header class="exam-title">
     <div class="section-container">
@@ -21,13 +25,14 @@
         <h1 class="title">Formación de Grupos</h1>
       </div>
       <div class="intento-panel">
-        Página principal del sistema
+        Buscar:
       </div>
       <input type="text" id="busquedaMensajes" placeholder="Buscar mensajes..." class="input-busqueda">
     </div>
+
   </header>
 
-  <!-- Contenido principal -->
+  <!-- Main content -->
   <main class="main-content" id="mainFlexContainer">
     <!-- Chat y mensajes -->
     <section class="mensajes" id="chatSection">
@@ -38,7 +43,7 @@
 
       <form id="formMensaje" class="form-mensaje">
         <input type="text" id="mensaje" placeholder="Escribe tu mensaje aquí..." required>
-        <button type="submit">Enviar</button>
+        <button class="submit" type="submit">Enviar</button>
       </form>
 
       <ul id="listaMensajes" class="lista-mensajes"></ul>
@@ -46,26 +51,24 @@
       <section class="acciones-admin" id="accionesAdmin">
         <button id="btnBorrarTodos" class="btn-borrar-todos">🗑️ Borrar todos los mensajes</button>
         <input type="number" id="personasPorGrupo" placeholder="Personas por grupo" min="1">
-        <button id="btnGenerarGrupos">Generar Grupos</button>
       </section>
-    </section>
-
-    <!-- Contenedor de grupos a la derecha -->
-    <section id="contenedorGrupos">
-      <h3>Grupos</h3>
-      <div id="listaGrupos"></div>
+      <button id="btnGenerarGrupos">Generar Grupos</button>
     </section>
   </main>
 
-  <div id="accionesUsuario">
+  <!-- Modal Grupos -->
+  <div id="modalGrupos" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h3>Grupos</h3>
+      <div id="listaGruposModal"></div>
+    </div>
+  </div>
+
+  <!-- Botón Salir abajo -->
+  <div id="botonSalirAbajo">
     <button id="btnSalir">Salir</button>
   </div>
-
-  <div id="accionesAdmin" style="display:none;">
-    <button id="btnGenerarGrupos">Generar Grupos</button>
-    <input type="number" id="personasPorGrupo" placeholder="Personas por grupo" min="1" style="width:150px;">
-  </div>
-
   <!-- Footer -->
   <footer class="creditos">
     <p>© 2025 | Sergio Hidalgo Granados — <strong>shidalgra</strong><br>
@@ -73,10 +76,11 @@
     </p>
   </footer>
 
-  <!-- Firebase y Scripts externos -->
+  <!-- Firebase y Scripts -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/gruposModal.js"></script>
 </body>
 
 </html>
