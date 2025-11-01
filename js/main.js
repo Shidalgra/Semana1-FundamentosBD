@@ -1,8 +1,8 @@
 // ==========================
 // CONFIGURACIÓN FIREBASE
 // ==========================
-const CODIGO_ESTUDIANTE = "ALPHA2025";
-const CODIGO_ADMIN = "ADMIN2025";
+const CODIGO_ESTUDIANTE = "GRUPOSICO2026";
+const CODIGO_ADMIN = "ADMINSHIDALGRA2026";
 
 const firebaseConfig = {
     apiKey: "AIzaSyBC2UKajbQh3X1b7qGE0VwIfgx0qUFzkXM",
@@ -124,6 +124,9 @@ function mostrarMensajes() {
 // FUNCIONES DE USUARIOS Y BORRADO TOTAL DEL CURSO ACTUAL
 // ==========================
 
+/**
+ * Función que elimina TODAS las colecciones asociadas ÚNICAMENTE al cursoID actual.
+ */
 async function borrarTodaLaBaseDeDatos() {
     // 1. Verificación de seguridad y contexto
     if (tipoUsuario !== "admin" || !cursoID) {
@@ -151,6 +154,7 @@ async function borrarTodaLaBaseDeDatos() {
     if (confirmacion) {
         try {
             // 3. Colecciones dinámicas basadas ÚNICAMENTE en cursoID para aislamiento
+            // ¡Esta es la clave de la seguridad! Solo borra las colecciones del curso activo.
             const colecciones = [`${cursoID}_mensajes`, `${cursoID}_usuariosConectados`, `${cursoID}_gruposAsignados`];
             
             for (const nombreColeccion of colecciones) {
@@ -234,7 +238,6 @@ async function checkAndFillName(cedula, cursoID) {
     const cleanCursoID = cursoID.trim().toUpperCase();
     
     // Si la cédula es muy corta o el curso no tiene formato, salimos.
-    // La limpieza (borrado y habilitado) ya la hace el listener ANTES de llamar a esta función.
     if (cleanCedula.length < 6 || cleanCursoID.length < 4) {
         return;
     }
