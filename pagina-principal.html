@@ -14,30 +14,26 @@
 
 <body>
   <header class="exam-title">
-    <!-- Botón Ver Grupos arriba -->
     <div class="contenedor-accionesUsuario">
       <div id="accionesUsuario">
         <button id="btnVerGrupos">Ver Grupos</button>
       </div>
     </div>
-    
-    <!-- Header -->
+
     <div class="contendor-logoNombre">
       <div class="top-bar">
         <img src="images/LogoFondoBlanco.png" alt="Logo" class="logo-top-left">
         <h1 class="title">Formación de Grupos</h1>
       </div>
     </div>
-    
+
     <div class="contenedor-busqueda">
       <label for="busquedaMensajes" class="lbl-buscar">Buscar:</label>
       <input type="text" id="busquedaMensajes" placeholder="Buscar..." class="input-busqueda" />
     </div>
   </header>
 
-  <!-- Main content -->
   <main class="main-content" id="mainFlexContainer">
-    <!-- Chat y mensajes -->
     <section class="mensajes" id="chatSection">
       <section class="bienvenida">
         <h2>Hola, <span id="nombreUsuario"></span> !!!</h2>
@@ -52,35 +48,38 @@
       <ul id="listaMensajes" class="lista-mensajes"></ul>
 
       <section class="acciones-admin" id="accionesAdmin">
-        <button id="btnBorrarTodos" class="btn-borrar-todos">🗑️ Borrar todos los mensajes</button>
-        <input type="number" id="personasPorGrupo" placeholder="Personas por grupo" min="1">
+        <button id="btnBorrarTodos" class="btn-borrar-todos">Borrar todos los mensajes</button>
+        <input type="number" id="personasPorGrupo" placeholder="Personas por grupo" min="1" style="display:none;">
       </section>
+      
       <button id="btnGenerarGrupos">Generar Grupos</button>
+
     </section>
   </main>
 
-  <!-- Modal Grupos -->
   <div id="modalGrupos" class="modal">
     <div class="modal-content">
       <span class="close-modal">&times;</span>
-      <h3>Grupos</h3>
+      <h3>Grupos Asignados</h3>
       <div id="listaGruposModal"></div>
     </div>
   </div>
 
 
-  <!-- Footer -->
   <footer class="creditos">
-    <p>© 2025 | Sergio Hidalgo Granados — <strong>shidalgra</strong><br>
+    <div id="botonBorrarDBAbajo">
+      <button id="btnBorrarDBCompleta" class="btn-borrar-BD oculto-admin">Borrar DB</button>
+    </div>
+    
+    <p id="footer-credits-text">© 2025 | Sergio Hidalgo Granados — <strong>shidalgra</strong><br>
       <em>Activando Coeficiente Intelectual</em>
     </p>
-    <!-- Botón Salir abajo -->
+
     <div id="botonSalirAbajo">
       <button id="btnSalir">Salir</button>
     </div>
   </footer>
-
-  <!-- Firebase y Scripts -->
+  
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="js/main.js"></script>

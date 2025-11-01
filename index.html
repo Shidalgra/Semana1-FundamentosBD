@@ -14,7 +14,6 @@
 
 <body>
 
-  <!-- Header tipo examen -->
   <header class="exam-title">
     <div class="section-container">
       <div class="top-bar">
@@ -27,13 +26,15 @@
     </div>
   </header>
 
-  <!-- Contenedor del formulario -->
   <main class="login-container">
     <div class="login-box">
       <h2>Acceso</h2>
+      
+      <label for="cedula">Cédula:</label>
+      <input type="text" id="cedula" required placeholder="Número de Cédula" pattern="[0-9]{9,12}">
 
       <label for="nombre">Nombre completo</label>
-      <input type="text" id="nombre" placeholder="Ejemplo: Sergio Hidalgo Granados">
+      <input type="text" id="nombre" placeholder="Ejemplo: Sergio Hidalgo Granados" required>
 
       <label for="codigo">Código de acceso</label>
       <input type="password" id="codigo" placeholder="Código que da el profesor">
@@ -47,8 +48,9 @@
       <em>Activando Coeficiente Intelectual</em>
     </p>
   </footer>
-  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="js/main.js"></script>
 </body>
 

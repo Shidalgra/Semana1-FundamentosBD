@@ -24,457 +24,471 @@ body {
     display: none !important;
 }
 
-/* CABECERA */
+/* ========================== */
+/* CABECERA (Header de Ambas páginas) */
+/* ========================== */
 .exam-title {
   display: flex;
-  flex-direction: row;
   width: 100%;
   background-color: #072D4E;
   color: white;
-  padding: 20px 0;
+  padding: 20px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  align-content: space-around;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .exam-title .title {
   font-size: clamp(1.5rem, 3vw, 2rem);
-  font-weight: 700;
   text-align: center;
 }
 
-.intento-panel {
-  margin-top: 5px;
-  font-size: 1.1em;
-  color: #dfeaff;
-  text-align: center;
+.logo-top-left {
+  height: 50px;
+  width: auto;
+  margin-right: 15px;
 }
 
-/* FORMULARIO */
+.top-bar {
+  display: flex;
+  align-items: center;
+}
+
+/* --- ESTILOS ESPECÍFICOS PARA INDEX.HTML (LOGIN PAGE) --- */
+.exam-title .section-container {
+    /* Esta sección asegura que el logo y el título se centren en el login */
+    width: 100%;
+    max-width: 900px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.exam-title .intento-panel {
+    background-color: #004080;
+    color: white;
+    padding: 5px 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
 .login-container {
-  margin-top: auto;
+  flex-grow: 1;
   display: flex;
   justify-content: center;
+  align-items: center;
   width: 100%;
+  margin-bottom: 50px; /* Espacio para el footer */
 }
 
 .login-box {
-  background: #ffffff;
-  padding: 30px 40px;
-  border-radius: 15px;
-  box-shadow: 6px 6px 12px #c5c9d1, -6px -6px 12px #ffffff;
-  width: 90%;
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
   max-width: 400px;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
 }
 
 .login-box h2 {
-  color: #072D4E;
+  text-align: center;
+  color: #004080;
   margin-bottom: 20px;
-  font-weight: 700;
 }
 
-.bienvenida h2 {
-  margin-top: 15px;
-}
-
-.bienvenida p {
-  margin-top: 10px;
-}
-
-label {
-  display: block;
-  text-align: left;
-  color: #333;
-  margin-top: 10px;
+.login-box label {
   font-weight: 600;
+  margin-top: 10px;
+  color: #333;
 }
 
-input {
-  width: 100%;
+.login-box input[type="text"],
+.login-box input[type="password"] {
   padding: 10px;
-  margin-top: 5px;
-  border: none;
-  border-radius: 8px;
-  box-shadow: inset 4px 4px 8px #d9dde3, inset -4px -4px 8px #ffffff;
-  background-color: #f7f9fb;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
   font-size: 1rem;
 }
 
-.contenedor-busqueda{
-  position: absolute;
-  right: 15px;
-  display: flex;
-}
-
-.lbl-buscar{
-  color: #fff;
-  margin-right: 10px;
-}
-
-input:focus,
-textarea:focus,
-.input-busqueda:focus {
-  outline: none;
-  /* elimina el borde de focus */
-  border: 2px solid #c8bc16;
-  /* si quieres un borde personalizado */
-}
-
-.input-busqueda {
-  width: 200px;
-  padding: 8px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-#btnVerGrupos {
-  position: absolute;
-  left: 15px;
+/* Botón de Ingresar */
+.login-box .submit {
+  padding: 12px;
+  border: none;
   background-color: #004080;
   color: white;
-  border: none;
+  cursor: pointer;
   border-radius: 5px;
-  padding: 10px 20px;
-  cursor: pointer;
-  font-weight: bold;
-  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.2s ease-in-out, transform 0.2s;
-  z-index: 1000;
-  /* 👈 asegura que siempre quede visible */
-  box-shadow: 0.15px 0.15px 10px rgba(146, 149, 155, 0.6),
-    -0.15px -0.15px 10px rgba(151, 151, 151, 0.4);
+  font-weight: 700;
+  margin-top: 10px;
+  transition: background-color 0.2s, box-shadow 0.1s, transform 0.1s;
 }
 
-#btnVerGrupos:hover {
-  background-color: #0066cc;
-  transform: scale(1.05);
-  box-shadow: 0.1px 0.1px 20px rgba(143, 146, 152, 0.6),
-    -0.1px -0.1px 20px rgba(123, 120, 120, 0.4);
+.login-box .submit:hover {
+  background-color: #0056b3;
+  box-shadow: 0 0 15px rgba(0, 86, 179, 0.5);
 }
 
-#btnVerGrupos:active {
-  background-color: #0066cc;
-  transform: scale(0.9);
+.login-box .submit:active {
+  background-color: #003366;
+  transform: scale(0.98);
+  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.3);
 }
 
-.submit {
-  right: 15px;
-  margin-top: 20px;
-  background-color: #004080;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 10px 20px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s ease-in-out, transform 0.2s;
-  z-index: 1000;
-  /* 👈 asegura que siempre quede visible */
-  box-shadow: 0.15px 0.15px 10px rgba(4, 46, 129, 0.6),
-    -0.15px -0.15px 10px rgba(4, 46, 129, 0.4);
+/* --- ESTILOS ESPECÍFICOS PARA PAGINA-PRINCIPAL.HTML --- */
+
+/* Botón Ver Grupos (Izquierda Fija en Header) */
+.contenedor-accionesUsuario {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
 }
 
-.submit:hover {
-  background-color: #0066cc;
-  transform: scale(1.05);
-  box-shadow: 0.1px 0.1px 20px rgba(4, 46, 129, 0.6),
-    -0.1px -0.1px 20px rgba(4, 46, 129, 0.4);
+/* Búsqueda (Derecha Fija en Header) */
+.contenedor-busqueda {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex; 
+    align-items: center;
+    z-index: 10;
 }
 
-.submit:active {
-  background-color: #0066cc;
-  transform: scale(0.9);
+.contenedor-busqueda .lbl-buscar {
+    white-space: nowrap;
+    margin-right: 5px;
+    font-weight: 600;
 }
 
-/* ====== Footer Mejorado ====== */
-.creditos {
-  width: 100%;
+.contenedor-busqueda .input-busqueda {
+    padding: 5px;
+    border-radius: 5px;
+    border: none;
+    width: 150px;
+}
+
+/* MAIN CONTENT */
+.main-content {
+  width: 90%;
+  max-width: 900px;
+  margin: 20px auto;
+  padding-bottom: 70px; 
+  flex-grow: 1;
+}
+
+/* CHAT SECTION y FORMULARIO */
+.mensajes {
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.bienvenida {
+  margin-bottom: 20px;
   text-align: center;
-  font-size: 0.95em;
-  color: #f0f0f0;
-  /* texto claro */
-  background: #111;
-  /* fondo oscuro */
-  padding: 15px 10px;
-  margin-top: auto;
-  border-top: 2px solid #333;
-  /* línea sutil arriba */
-  position: relative;
-  bottom: 0;
-  /* que se quede abajo del contenido */
 }
 
-.creditos p {
-  margin: 4px 0;
-  line-height: 1.5;
+.bienvenida h2 {
+  color: #004080;
+  font-weight: 700;
+  margin-bottom: 5px;
 }
 
-.creditos strong {
-  color: #4FC3F7;
-  /* un azul brillante */
+.form-mensaje {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.form-mensaje input[type="text"] {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px 0 0 8px;
+  font-size: 1rem;
+}
+
+/* Botón Enviar Mensaje (Chat) */
+.form-mensaje .submit {
+  padding: 10px 15px;
+  border: none;
+  background-color: #004080;
+  color: white;
+  cursor: pointer;
+  border-radius: 0 8px 8px 0;
   font-weight: 600;
+  transition: background-color 0.2s, box-shadow 0.1s, transform 0.1s;
 }
 
-.creditos em {
-  color: #aaa;
-  font-style: italic;
+.form-mensaje .submit:hover {
+  background-color: #0056b3;
+}
+
+.form-mensaje .submit:active {
+  background-color: #003366;
+  transform: scale(0.98);
+  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.3);
 }
 
 .lista-mensajes {
-  list-style: none;
+  list-style-type: none;
   padding: 0;
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  padding: 10px;
+  border-radius: 8px;
 }
 
 .mensaje-item {
-  background: #fff;
-  margin: 8px 0;
-  padding: 10px 15px;
-  border-radius: 10px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-  position: relative;
+  padding: 8px 0;
+  border-bottom: 1px dashed #eee;
   line-height: 1.4;
+  position: relative;
 }
 
 .btn-borrar {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: #ff4d4d;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 4px 8px;
-  cursor: pointer;
-  font-size: 0.9em;
-  display: none;
-  /* oculto por defecto */
-  transition: 0.2s;
-}
-
-.mensaje-item:hover .btn-borrar {
-  display: inline-block;
-  /* aparece al pasar el mouse */
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    opacity: 0.5;
+    transition: opacity 0.2s, transform 0.1s;
 }
 
 .btn-borrar:hover {
-  background: #d63333;
+    opacity: 1;
+    color: red;
+}
+
+.btn-borrar:active {
+    transform: scale(0.9);
 }
 
 .acciones-admin {
-  text-align: center;
-  margin: 20px 0;
-  display: none;
-  /* se muestra solo si es admin */
+  display: flex;
+  flex-wrap: wrap; 
+  align-items: center;
+  gap: 10px; 
+  margin-top: 15px;
+  padding-bottom: 10px;
 }
 
-/* Botón de borrar todos los mensajes */
+/* Botón Borrar Todos los Mensajes */
 .btn-borrar-todos {
-  background-color: #d33;
-  /* rojo fuerte */
-  margin-bottom: 2%;
-  color: white;
-  padding: 12px 25px;
+  padding: 10px 15px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2), -4px -4px 10px #ffffff;
+  font-weight: 600;
+  background-color: #d9534f; 
+  color: white;
+  transition: background-color 0.2s, box-shadow 0.1s, transform 0.1s;
 }
 
 .btn-borrar-todos:hover {
-  background-color: #ff4d4d;
-  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3), -2px -2px 6px #ffffff;
-  transform: scale(1.05);
+    background-color: #c9302c;
+    box-shadow: 0 0 10px rgba(217, 83, 79, 0.5);
 }
 
 .btn-borrar-todos:active {
-  background-color: #ff4d4d;
-  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3), -2px -2px 6px #ffffff;
-  transform: scale(0.95);
+    background-color: #a9201e;
+    transform: scale(0.98);
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.3);
 }
 
 
-/* --- BOTÓN SALIR --- */
-#btnSalir {
-  position: absolute;
-  right: 15px;
-  bottom: 10px;
-  background-color: #004080;
-  color: white;
+/* Botones de Acción (Ver Grupos, Generar Grupos) */
+#btnGenerarGrupos, #btnVerGrupos {
+  padding: 10px 15px;
   border: none;
-  border-radius: 10px;
-  padding: 10px 20px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s ease-in-out, transform 0.2s;
-  z-index: 1000;
-  /* 👈 asegura que siempre quede visible */
-  box-shadow: 0.15px 0.15px 10px rgba(146, 149, 155, 0.6),
-    -0.15px -0.15px 10px rgba(151, 151, 151, 0.4);
+  font-weight: 600;
+  background-color: #007bff; 
+  color: white;
+  transition: background-color 0.2s, box-shadow 0.1s, transform 0.1s;
+}
+
+#btnGenerarGrupos:hover, #btnVerGrupos:hover {
+  background-color: #0056b3;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+#btnGenerarGrupos:active, #btnVerGrupos:active {
+  background-color: #004080;
+  transform: scale(0.98);
+  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.3);
+}
+
+
+/* ========================== */
+/* FOOTER Y BOTONES FIJOS INFERIORES */
+/* ========================== */
+.creditos {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    background-color: #000d1a;
+    color: white;
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.7);
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 10px 20px;
+}
+
+/* Centrar el texto de créditos */
+#footer-credits-text {
+    text-align: center;
+    flex-grow: 1; 
+    margin: 0 40px; 
+}
+
+/* Estilo base para los botones de Salir y Borrar DB */
+#botonSalirAbajo button,
+.btn-borrar-BD {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background-color 0.2s, box-shadow 0.1s, transform 0.1s;
+}
+
+/* Estilo para el botón de Borrado Total (PELIGRO) */
+.btn-borrar-BD {
+    background-color: #A30000 !important; 
+    color: white !important;
+}
+
+.btn-borrar-BD:hover {
+    background-color: #C00000 !important;
+    box-shadow: 0 0 10px rgba(163, 0, 0, 0.5);
+}
+
+.btn-borrar-BD:active {
+    background-color: #830000 !important;
+    transform: scale(0.98);
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Estilo para el botón de Salir */
+#btnSalir {
+    background-color: #007bff; 
+    color: white;
 }
 
 #btnSalir:hover {
-  background-color: #0066cc;
-  transform: scale(1.05);
-  box-shadow: 0.1px 0.1px 20px rgba(143, 146, 152, 0.6),
-    -0.1px -0.1px 20px rgba(123, 120, 120, 0.4);
+    background-color: #0056b3;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
 }
 
 #btnSalir:active {
-  background-color: #0066cc;
-  transform: scale(0.9);
+    background-color: #004080;
+    transform: scale(0.98);
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.3);
 }
 
-/* Contenedor principal de grupos */
-#contenedorGrupos {
-  float: right;
-  width: 30%;
-  border-left: 2px solid #ccc;
-  padding-left: 15px;
-  max-height: 80vh;
-  /* Altura máxima para scroll */
-  overflow-y: auto;
-  background-color: #f9f9f9;
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
-  padding-top: 10px;
-}
 
-/* Título de la sección */
-#contenedorGrupos h3 {
-  font-family: 'Arial', sans-serif;
-  color: #004080;
-  text-align: center;
-  margin-bottom: 15px;
-}
-
-/* Cada grupo */
-#listaGrupos div {
-  background-color: #e6f0ff;
-  border: 1px solid #004080;
-  border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 10px;
-  font-family: 'Arial', sans-serif;
-  transition: transform 0.2s;
-}
-
-/* Efecto hover en grupo */
-#listaGrupos div:hover {
-  transform: scale(1.02);
-  background-color: #cce0ff;
-}
-
-/* Nombre del grupo */
-#listaGrupos div strong {
-  color: #004080;
-  font-size: 1.1em;
-}
-
-#btnGenerarGrupos {
-  margin-top: 15px;
-  margin-bottom: 15%;
-  right: 15px;
-  bottom: 10px;
-  background-color: #004080;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 10px 20px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s ease-in-out, transform 0.2s;
-  z-index: 1000;
-  /* 👈 asegura que siempre quede visible */
-  box-shadow: 0.15px 0.15px 10px rgba(4, 46, 129, 0.6),
-    -0.15px -0.15px 10px rgba(4, 46, 129, 0.4);
-}
-
-#btnGenerarGrupos:hover {
-  background-color: #0066cc;
-  transform: scale(1.05);
-  box-shadow: 0.1px 0.1px 20px rgba(4, 46, 129, 0.6),
-    -0.1px -0.1px 20px rgba(4, 46, 129, 0.4);
-}
-
-#btnGenerarGrupos:active {
-  background-color: #0066cc;
-  transform: scale(0.9);
-}
-
-/* ====== MODAL DE GRUPOS ====== */
+/* ========================== */
+/* MODAL DE GRUPOS */
+/* ========================== */
 .modal {
-  display: none;
-  /* oculto por defecto */
-  position: fixed;
-  bottom: 80px;
-  /* 👈 un poco arriba del botón salir */
-  right: 100px;
-  /* 👈 hacia la izquierda desde el borde derecho */
-  z-index: 999;
-  background-color: rgba(0, 0, 0, 0.3);
-  width: 100%;
-  height: 100%;
-  justify-content: flex-end;
-  align-items: flex-end;
+    display: none; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    background-color: rgba(0, 0, 0, 0.3);
+    width: 100%;
+    height: 100%;
+    justify-content: flex-start;
+    align-items: flex-start;
 }
 
 .modal-content {
-  background: #fff;
-  border-radius: 12px;
-  padding: 20px;
-  width: 300px;
-  max-height: 60vh;
-  overflow-y: auto;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  position: absolute;
-  bottom: 80px;
-  right: 40px;
-  animation: aparecer 0.25s ease-in-out;
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    width: 380px; 
+    max-height: 85vh; 
+    overflow-y: auto;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    
+    /* Posicionamiento bajo el botón "Ver Grupos" */
+    position: absolute;
+    top: 90px;  
+    left: 20px; 
+    
+    animation: aparecer 0.3s ease-out;
 }
 
-/* Animación suave */
-@keyframes aparecer {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Botón cerrar */
 .close-modal {
-  position: absolute;
-  top: 8px;
-  right: 10px;
-  font-size: 1.5em;
-  color: #333;
-  cursor: pointer;
-  transition: 0.2s;
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: -5px;
+    margin-right: -5px;
 }
 
-.close-modal:hover {
-  color: #d33;
+.modal-content h3 {
+    border-bottom: 2px solid #004080;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    color: #004080;
+    font-size: 1.3rem;
 }
 
-/* Estilo del contenido interno del modal */
-#listaGruposModal div {
-  background-color: #e6f0ff;
-  border: 1px solid #004080;
-  border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 10px;
-  transition: 0.2s;
+/* Estilo para cada tarjeta de grupo */
+.grupo-card {
+    border: 1px solid #004080;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    background-color: #e6f0ff; 
 }
 
-#listaGruposModal div:hover {
-  transform: scale(1.02);
-  background-color: #cce0ff;
+.grupo-card h3 {
+    font-size: 1.1rem;
+    color: #004080;
+    border-bottom: none;
+    margin-top: 0;
+    padding-bottom: 0;
+    font-weight: 700;
+}
+
+.grupo-card ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 5px;
+}
+
+.grupo-card li {
+    font-size: 0.9rem;
+    color: #333;
+    line-height: 1.4;
+    padding-left: 10px;
+    border-left: 3px solid #007bff;
+    margin-bottom: 3px;
 }
