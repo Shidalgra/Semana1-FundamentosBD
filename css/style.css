@@ -111,11 +111,14 @@ body {
 .login-box input[type="text"],
 .login-box input[type="password"],
 .login-box select {
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 1rem;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #004080; /* Borde consistente con el menú */
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: #072D4E; /* Color de fondo del menú */
+    color: white; /* Color de texto del menú */
+    cursor: pointer;
 }
 
 /* Botón de Ingresar */
@@ -477,8 +480,9 @@ body {
     
     /* Posicionamiento bajo el botón "Ver Grupos" */
     position: absolute;
-    top: 90px;  
-    left: 20px; 
+    top: 50%;  
+    left: 50%; 
+    transform: translate(-50%, -50%);
     
     animation: aparecer 0.3s ease-out;
 }
@@ -573,8 +577,10 @@ body {
 
     .modal-content {
         width: 90%;
-        left: 5%;
-        top: 10%;
+        /* Se mantiene centrado gracias a la nueva regla de transform */
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
     }
 
     .creditos {

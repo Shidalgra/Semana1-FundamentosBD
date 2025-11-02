@@ -645,11 +645,14 @@ async function moverMiembro(evento, gruposActuales) {
 
     // Crear un mapa de opciones para el dropdown de Swal
     const opcionesGrupos = {};
-    Object.values(gruposActuales).forEach(g => {
-        if (g.id !== idGrupoOrigen) { // No mostrar el grupo actual como opción de destino
-            opcionesGrupos[g.id] = Object.keys(gruposActuales).find(key => gruposActuales[key].id === g.id);
-        }
+    const nombreGrupoOrigen = Object.keys(gruposActuales).find(key => gruposActuales[key].id === idGrupoOrigen);
+
+    Object.entries(gruposActuales).forEach(([nombre, data]) => {
+        opcionesGrupos[data.id] = nombre;
     });
+
+    // Deshabilitar el grupo de origen en las opciones
+    const inputAttributes = { [idGrupoOrigen]: 'disabled' };
 
     const { value: idGrupoDestino } = await Swal.fire({
         title: `Mover a ${nombreMiembro}`,
@@ -657,6 +660,7 @@ async function moverMiembro(evento, gruposActuales) {
         input: 'select',
         inputOptions: opcionesGrupos,
         inputPlaceholder: 'Seleccionar un grupo',
+        inputAttributes,
         showCancelButton: true,
         confirmButtonText: 'Mover',
         cancelButtonText: 'Cancelar'
@@ -814,7 +818,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Conectar los botones del menú a sus funciones
             btnGenerarGruposMenu?.addEventListener("click", generarGruposAleatorios);
-            btnBorrarMensajesMenu?.addEventListener("click", () => document.getElementById("btnBorrarTodos")?.click()); // Simula clic en el botón lógico
+            btnBorrarMensajesMenu?.addEventListener("click", borrarTodosLosMensajes); // Llama a la función directamente
             btnBorrarDBMenu?.addEventListener("click", borrarTodaLaBaseDeDatos);
         } else {
             // No es necesario hacer nada, los botones ya están ocultos por defecto.
@@ -882,3 +886,33 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 });
+
+/**
+ * Función reutilizable para borrar todos los mensajes del curso actual.
+ * Ahora es independiente y puede ser llamada desde cualquier botón.
+ */
+async function borrarTodosLosMensajes() {
+    if (tipoUsuario !== "admin" || !cursoID) return;
+
+    const confirm = await Swal.fire({
+        icon: "warning",
+        title: "¿Borrar TODOS los mensajes?",
+        text: `Esta acción eliminará TODOS los mensajes de la sesión **${cursoID}** y no se puede deshacer.`,
+        showCancelButton: true,
+        confirmButtonText: "Sí, borrar todo",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "#d33"
+    });
+
+    if (confirm.isConfirmed) {
+        try {
+            const snapshot = await db.collection(`${cursoID}_mensajes`).get();
+            const batch = db.batch();
+            snapshot.forEach(doc => batch.delete(doc.ref));
+            await batch.commit();
+            Swal.fire({ icon: "success", title: "Todos los mensajes eliminados", timer: 1500, showConfirmButton: false });
+        } catch (error) {
+            console.error("Error al borrar mensajes:", error);
+        }
+    }
+}
