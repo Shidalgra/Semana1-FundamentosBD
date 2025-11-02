@@ -1,8 +1,17 @@
 // ==========================
 // CONFIGURACIÓN FIREBASE
 // ==========================
-const CODIGO_ESTUDIANTE = "GRUPOSICO2026";
 const CODIGO_ADMIN = "ADMINSHIDALGRA2026";
+
+// NUEVA CONFIGURACIÓN DE CURSOS Y CLAVES
+// Aquí se definen los cursos que aparecerán en el login y su clave de acceso.
+// Para añadir un nuevo curso, simplemente agrega una nueva línea.
+const CURSOS_CONFIG = {
+    "INF1003": "CLAVE2026A",
+    "INF2003": "CLAVE2026B",
+    "INF1004": "CLAVE2026C",
+    "TCS1003": "CLAVE2026D"
+};
 
 const firebaseConfig = {
     apiKey: "AIzaSyBC2UKajbQh3X1b7qGE0VwIfgx0qUFzkXM",
@@ -113,7 +122,7 @@ function mostrarMensajes() {
     }
 
     db.collection(`${cursoID}_mensajes`)
-        .orderBy("fecha", "asc")
+        .orderBy("fecha", "desc")
         .onSnapshot(snapshot => {
             mensajesCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             renderizarMensajes(document.getElementById('busquedaMensajes')?.value || "");
@@ -270,21 +279,23 @@ async function checkAndFillName(cedula, cursoID) {
 // ==========================
 document.getElementById('btnIngresar')?.addEventListener('click', async () => {
     const cursoID_input = document.getElementById('cursoID').value.trim().toUpperCase();
-    const nombre = document.getElementById('nombre').value.trim();
-    // La cédula ya está limpia gracias al listener
-    const cedula = document.getElementById('cedula').value.trim(); 
+    const nombreInput = document.getElementById('nombre');
+    const cedulaInput = document.getElementById('cedula');
+    const nombre = nombreInput.value.trim();
+    const cedula = cedulaInput.value.trim(); 
     const codigo = document.getElementById('codigo').value.trim();
 
     // 1. Validación de Curso ID
-    if (!/^[A-Z0-9]{4,10}$/.test(cursoID_input)) {
-        Swal.fire({ icon: 'warning', title: 'Código de Curso Inválido', html: 'El código del curso debe ser alfanumérico (letras y números) y tener entre 4 y 10 caracteres (Ej: INF1004).', confirmButtonColor: '#004080' });
+    // Ahora se valida que se haya seleccionado un curso del dropdown.
+    if (!cursoID_input) {
+        Swal.fire({ icon: 'warning', title: 'Selecciona un curso', text: 'Debes seleccionar un curso de la lista.', confirmButtonColor: '#004080' });
         return;
     }
 
     // 2. Validación de Nombre
     const palabras = nombre.split(" ").filter(p => p.length > 0);
-    if (palabras.length < 3 || !palabras.every(p => /^[A-Za-zÁÉÍÓÚáéíóúÑñ]{3,10}$/.test(p))) {
-        Swal.fire({ icon: 'warning', title: 'Nombre inválido', html: 'Debes usar al menos 3 palabras de 3-10 letras cada una.', confirmButtonColor: '#004080' });
+    if (palabras.length < 2) {
+        Swal.fire({ icon: 'warning', title: 'Nombre inválido', html: 'Debes ingresar al menos tu nombre y un apellido.', confirmButtonColor: '#004080' });
         return;
     }
     
@@ -296,9 +307,37 @@ document.getElementById('btnIngresar')?.addEventListener('click', async () => {
 
     // 4. Validación de Código de Acceso
     let tipoUsuarioDeterminado;
-    if (codigo === CODIGO_ADMIN) tipoUsuarioDeterminado = "admin";
-    else if (codigo === CODIGO_ESTUDIANTE) tipoUsuarioDeterminado = "invitado";
-    else {
+    const claveCorrectaEstudiante = CURSOS_CONFIG[cursoID_input];
+    const cursosActivosRef = db.collection('_cursosActivos');
+
+    if (codigo === CODIGO_ADMIN) {
+        tipoUsuarioDeterminado = "admin";
+        // El admin inicia el curso: se asegura de que el documento del curso exista.
+        try {
+            await cursosActivosRef.doc(cursoID_input).set({
+                iniciadoPor: nombre,
+                fechaInicio: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+        } catch (error) {
+            console.error("Error al inicializar el curso:", error);
+            Swal.fire({ icon: 'error', title: 'Error de Red', text: 'No se pudo inicializar el curso. Revisa tu conexión.', confirmButtonColor: '#d33' });
+            return;
+        }
+    } else if (codigo === claveCorrectaEstudiante) {
+        tipoUsuarioDeterminado = "invitado";
+        // El estudiante intenta ingresar: se verifica si el curso ya fue iniciado por un admin.
+        try {
+            const cursoDoc = await cursosActivosRef.doc(cursoID_input).get();
+            if (!cursoDoc.exists) {
+                Swal.fire({ icon: 'error', title: 'Curso no disponible', text: 'El docente aún no ha iniciado la sesión para este curso.', confirmButtonColor: '#d33' });
+                return;
+            }
+        } catch (error) {
+            console.error("Error al verificar el curso:", error);
+            Swal.fire({ icon: 'error', title: 'Error de Red', text: 'No se pudo verificar el estado del curso. Revisa tu conexión.', confirmButtonColor: '#d33' });
+            return;
+        }
+    } else {
         Swal.fire({ icon: 'error', title: 'Código incorrecto', text: 'Verifica con el profesor el código.', confirmButtonColor: '#004080' });
         return;
     }
@@ -353,32 +392,70 @@ async function generarGruposAleatorios() {
         return;
     }
 
+    // --- NUEVA LÓGICA DE RE-GENERACIÓN ---
+    // Si ya hay grupos, preguntar si se quiere re-generar todo o solo añadir.
+    if (hayGruposExistentes) {
+        const decision = await Swal.fire({
+            title: 'Ya existen grupos',
+            text: '¿Qué deseas hacer?',
+            icon: 'question',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Crear grupos nuevos (Incremental)',
+            denyButtonText: 'Re-generar TODO desde cero',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (decision.isDenied) {
+            // Opción: Re-generar TODO desde cero.
+            const confirmacionBorrado = await Swal.fire({
+                title: '¿Estás seguro?',
+                text: 'Se borrarán TODOS los grupos existentes y se crearán de nuevo con todos los estudiantes. Esta acción es irreversible.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Sí, re-generar todo',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (!confirmacionBorrado.isConfirmed) return;
+
+            // Borrar todos los grupos existentes antes de continuar.
+            const batchDelete = db.batch();
+            snapshotGruposExistentes.docs.forEach(doc => batchDelete.delete(doc.ref));
+            await batchDelete.commit();
+        } else if (decision.isDismissed) {
+            return; // El usuario canceló.
+        }
+        // Si es .isConfirmed, la función continúa con la lógica incremental normal.
+    }
+
     const coleccionGrupos = db.collection(`${cursoID}_gruposAsignados`);
-    const snapshotGruposExistentes = await coleccionGrupos.orderBy("fechaGeneracion", "desc").get();
-    const hayGruposExistentes = !snapshotGruposExistentes.empty;
+    // Volvemos a obtener el estado actual por si se borraron los grupos.
+    const snapshotActualizado = await coleccionGrupos.orderBy("fechaGeneracion", "desc").get();
+    const hayGruposAhora = !snapshotActualizado.empty;
 
     // 1. OBTENER PARTICIPANTES NO ASIGNADOS
-    const snapshotUsuarios = await db.collection(`${cursoID}_usuariosConectados`).get();
+    const snapshotUsuarios = await db.collection(`${cursoID}_usuariosConectados`).where("tipoUsuario", "==", "invitado").get();
     const todosParticipantes = snapshotUsuarios.docs
-        .map(doc => doc.data())
-        .filter(u => u.tipoUsuario === "invitado");
+        .map(doc => doc.data());
 
     const miembrosAsignados = new Set();
     let ultimoNumGrupo = 0;
     let tamanoGrupoAnterior = 0;
 
-    if (hayGruposExistentes) {
-        snapshotGruposExistentes.docs.forEach(doc => {
+    if (hayGruposAhora) {
+        snapshotActualizado.docs.forEach(doc => {
             const grupo = doc.data();
             grupo.miembros.forEach(m => miembrosAsignados.add(m.cedula));
         });
         
-        const ultimoGrupo = snapshotGruposExistentes.docs[0]?.data();
+        const ultimoGrupo = snapshotActualizado.docs[0]?.data();
         if (ultimoGrupo && ultimoGrupo.miembros.length > 0) {
             tamanoGrupoAnterior = ultimoGrupo.miembros.length;
         }
 
-        const gruposExistentesArray = snapshotGruposExistentes.docs.map(doc => doc.data().nombreGrupo);
+        const gruposExistentesArray = snapshotActualizado.docs.map(doc => doc.data().nombreGrupo);
         const maxNum = gruposExistentesArray.reduce((max, name) => {
             const match = name.match(/(\d+)$/);
             return match ? Math.max(max, parseInt(match[1])) : max;
@@ -399,7 +476,7 @@ async function generarGruposAleatorios() {
     }
 
     // 2. CONFIRMACIÓN Y PREGUNTA DEL TAMAÑO
-    const mensajeAdvertencia = hayGruposExistentes 
+    const mensajeAdvertencia = hayGruposAhora 
         ? `<p style="color: darkred; font-weight: bold;">ADVERTENCIA: Ya existen grupos en **${cursoID}**. Se crearán grupos nuevos SÓLO con los ${participantesNuevos.length} estudiantes que faltan.</p>`
         : `<p>¡Esta es la primera asignación de grupos para **${cursoID}**!</p>`;
     
@@ -428,7 +505,7 @@ async function generarGruposAleatorios() {
     const shuffled = participantesNuevos.sort(() => Math.random() - 0.5);
     const gruposParaGuardar = [];
     
-    const gruposExistentesArray = snapshotGruposExistentes.docs.map(doc => doc.data().nombreGrupo);
+    const gruposExistentesArray = snapshotActualizado.docs.map(doc => doc.data().nombreGrupo);
     
     let nombreIndex = 0;
     while(nombreIndex < NOMBRES_GRIEGOS_ORDEN.length && gruposExistentesArray.includes(NOMBRES_GRIEGOS_ORDEN[nombreIndex])) {
@@ -486,14 +563,14 @@ async function mostrarGrupos(gruposRecibidos = null) {
         grupos = gruposRecibidos;
     } else {
         if (!cursoID) return;
-        try {
-            const snapshot = await db.collection(`${cursoID}_gruposAsignados`).get();
-            if (snapshot.empty) {
-                Swal.fire({ icon: "info", title: "Grupos aún no disponibles", text: `El administrador debe generar los grupos para el curso **${cursoID}** primero.`, confirmButtonColor: "#004080" });
-                return;
-            }
+        const snapshot = await db.collection(`${cursoID}_gruposAsignados`).get();
+        if (snapshot.empty) {
+            Swal.fire({ icon: "info", title: "Grupos aún no disponibles", text: `El administrador debe generar los grupos para el curso **${cursoID}** primero.`, confirmButtonColor: "#004080" });
+            return;
+        }
 
-            const gruposArray = snapshot.docs.map(doc => doc.data());
+        try {
+            const gruposArray = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             
             // Lógica de ordenación EXPLICITA (Griego + Numérico)
             gruposArray.sort((a, b) => {
@@ -524,7 +601,7 @@ async function mostrarGrupos(gruposRecibidos = null) {
             });
 
             gruposArray.forEach(data => {
-                grupos[data.nombreGrupo] = data.miembros;
+                grupos[data.nombreGrupo] = { miembros: data.miembros, id: data.id };
             });
 
         } catch (error) {
@@ -537,28 +614,119 @@ async function mostrarGrupos(gruposRecibidos = null) {
     const listaModal = document.getElementById("listaGruposModal");
     listaModal.innerHTML = "";
     
-    for (const [nombre, miembros] of Object.entries(grupos)) {
+    for (const [nombreGrupo, dataGrupo] of Object.entries(grupos)) {
+        const { miembros, id: idGrupo } = dataGrupo;
         const div = document.createElement("div");
         div.classList.add("grupo-card");
-        const miembrosHTML = miembros.map(m => `<li>${m.nombre} (Cédula: ${m.cedula})</li>`).join("");
-        div.innerHTML = `<h3>${nombre} (${miembros.length} personas)</h3><ul>${miembrosHTML}</ul>`;
+
+        const miembrosHTML = miembros.map(m => {
+            const botonMover = tipoUsuario === 'admin' 
+                ? `<button class="btn-mover-miembro" data-cedula-miembro="${m.cedula}" data-nombre-miembro="${m.nombre}" data-id-grupo-origen="${idGrupo}">🔄</button>` 
+                : '';
+            return `<li>${m.nombre} (Cédula: ${m.cedula}) ${botonMover}</li>`;
+        }).join("");
+
+        div.innerHTML = `<h3>${nombreGrupo} (${miembros.length} personas)</h3><ul>${miembrosHTML}</ul>`;
         listaModal.appendChild(div);
     }
 
+    // Añadir listeners a los nuevos botones de mover
+    if (tipoUsuario === 'admin') {
+        document.querySelectorAll('.btn-mover-miembro').forEach(btn => {
+            btn.addEventListener('click', (e) => moverMiembro(e, grupos));
+        });
+    }
+
     document.getElementById("modalGrupos").style.display = "flex";
+}
+
+async function moverMiembro(evento, gruposActuales) {
+    const { cedulaMiembro, nombreMiembro, idGrupoOrigen } = evento.target.dataset;
+
+    // Crear un mapa de opciones para el dropdown de Swal
+    const opcionesGrupos = {};
+    Object.values(gruposActuales).forEach(g => {
+        if (g.id !== idGrupoOrigen) { // No mostrar el grupo actual como opción de destino
+            opcionesGrupos[g.id] = Object.keys(gruposActuales).find(key => gruposActuales[key].id === g.id);
+        }
+    });
+
+    const { value: idGrupoDestino } = await Swal.fire({
+        title: `Mover a ${nombreMiembro}`,
+        text: 'Selecciona el grupo de destino:',
+        input: 'select',
+        inputOptions: opcionesGrupos,
+        inputPlaceholder: 'Seleccionar un grupo',
+        showCancelButton: true,
+        confirmButtonText: 'Mover',
+        cancelButtonText: 'Cancelar'
+    });
+
+    if (!idGrupoDestino) return;
+
+    try {
+        const dbBatch = db.batch();
+        const refGrupoOrigen = db.collection(`${cursoID}_gruposAsignados`).doc(idGrupoOrigen);
+        const refGrupoDestino = db.collection(`${cursoID}_gruposAsignados`).doc(idGrupoDestino);
+
+        // 1. Quitar miembro del grupo origen
+        const miembrosOrigen = gruposActuales[Object.keys(gruposActuales).find(k => gruposActuales[k].id === idGrupoOrigen)].miembros;
+        const nuevosMiembrosOrigen = miembrosOrigen.filter(m => m.cedula !== cedulaMiembro);
+        dbBatch.update(refGrupoOrigen, { miembros: nuevosMiembrosOrigen });
+
+        // 2. Añadir miembro al grupo destino
+        const miembroAMover = miembrosOrigen.find(m => m.cedula === cedulaMiembro);
+        dbBatch.update(refGrupoDestino, { 
+            miembros: firebase.firestore.FieldValue.arrayUnion(miembroAMover) 
+        });
+
+        await dbBatch.commit();
+
+        Swal.fire({
+            icon: 'success',
+            title: '¡Movido!',
+            text: `${nombreMiembro} ha sido movido de grupo.`,
+            timer: 2000,
+            showConfirmButton: false
+        });
+
+        mostrarGrupos(); // Recargar la vista de grupos
+    } catch (error) {
+        console.error("Error al mover miembro:", error);
+        Swal.fire('Error', 'No se pudo mover al miembro.', 'error');
+    }
 }
 
 
 // ==========================
 // MODAL DE GRUPOS Y LISTENERS
 // ==========================
-const modalGrupos = document.getElementById("modalGrupos");
-document.getElementById("btnVerGrupos")?.addEventListener("click", () => mostrarGrupos(null));
-document.getElementById("btnGenerarGrupos")?.addEventListener("click", generarGruposAleatorios);
-document.querySelector(".close-modal")?.addEventListener("click", () => modalGrupos.style.display = "none");
-window.addEventListener("click", e => { if (e.target === modalGrupos) modalGrupos.style.display = "none"; });
+function inicializarListenersUI() {
+    const modalGrupos = document.getElementById("modalGrupos");
+    const btnMenu = document.getElementById("btn-menu-hamburguesa");
+    const menuDesplegable = document.getElementById("menu-desplegable");
 
+    // --- Lógica del Menú Hamburguesa ---
+    btnMenu?.addEventListener("click", () => {
+        btnMenu.classList.toggle("active");
+        menuDesplegable.classList.toggle("active");
+    });
 
+    // Cerrar menú si se hace clic fuera
+    window.addEventListener("click", e => {
+        if (!btnMenu?.contains(e.target) && !menuDesplegable?.contains(e.target)) {
+            btnMenu?.classList.remove("active");
+            menuDesplegable?.classList.remove("active");
+        }
+        // Cerrar modal de grupos si se hace clic fuera
+        if (e.target === modalGrupos) modalGrupos.style.display = "none";
+    });
+
+    // --- Lógica del Modal de Grupos ---
+    document.getElementById("btnVerGruposMenu")?.addEventListener("click", () => mostrarGrupos(null));
+    document.querySelector(".close-modal")?.addEventListener("click", () => modalGrupos.style.display = "none");
+
+}
 // ==========================
 // FUNCIONES AUXILIARES
 // ==========================
@@ -572,7 +740,7 @@ function activarBotonSalir() {
             confirmButtonText: "Sí, salir",
             cancelButtonText: "Cancelar",
             confirmButtonColor: "#d33"
-        }).then(result => {
+        }).then((result) => {
             if (result.isConfirmed) {
                 // Eliminar todos los datos de sesión, incluido el curso
                 localStorage.removeItem("nombreEstudiante");
@@ -618,10 +786,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         mostrarMensajes();
-        activarBotonSalir();
+        inicializarListenersUI(); // Inicializa el nuevo menú y modal
+        activarBotonSalir(); // Activa el botón de salir del footer
         registrarUsuario(nombre, cedula);
 
-        const form = document.getElementById("formMensaje");
+        const form = document.getElementById("formMensaje"); // Formulario de chat
         form?.addEventListener("submit", async e => {
             e.preventDefault();
             const mensaje = document.getElementById("mensaje").value.trim();
@@ -631,26 +800,42 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         // Lógica de VISIBILIDAD DE ADMINISTRADOR:
-        const accionesAdminSection = document.getElementById("accionesAdmin"); // Contiene Borrar Mensajes
-        const btnGenerarGrupos = document.getElementById("btnGenerarGrupos");
-        const btnBorrarDBCompleta = document.getElementById("btnBorrarDBCompleta");
+        // Se obtienen las referencias a los botones DENTRO del menú.
+        const btnGenerarGruposMenu = document.getElementById("btnGenerarGruposMenu");
+        const btnBorrarMensajesMenu = document.getElementById("btnBorrarMensajesMenu");
+        const btnBorrarDBMenu = document.getElementById("btnBorrarDBMenu");
+        const btnSalirMenu = document.getElementById("btnSalirMenu");
 
         if (userType === "admin") {
-            if (accionesAdminSection) accionesAdminSection.classList.remove("oculto-admin");
-            if (btnGenerarGrupos) btnGenerarGrupos.style.display = "inline-block";
-            if (btnBorrarDBCompleta) btnBorrarDBCompleta.classList.remove("oculto-admin");
-            
+            // Si es admin, se quita la clase que los oculta.
+            btnGenerarGruposMenu?.classList.remove("oculto-admin");
+            btnBorrarMensajesMenu?.classList.remove("oculto-admin");
+            btnBorrarDBMenu?.classList.remove("oculto-admin");
+
+            // Conectar los botones del menú a sus funciones
+            btnGenerarGruposMenu?.addEventListener("click", generarGruposAleatorios);
+            btnBorrarMensajesMenu?.addEventListener("click", () => document.getElementById("btnBorrarTodos")?.click()); // Simula clic en el botón lógico
+            btnBorrarDBMenu?.addEventListener("click", borrarTodaLaBaseDeDatos);
         } else {
-            if (accionesAdminSection) accionesAdminSection.classList.add("oculto-admin");
-            if (btnGenerarGrupos) btnGenerarGrupos.style.display = "none";
-            if (btnBorrarDBCompleta) btnBorrarDBCompleta.classList.add("oculto-admin");
+            // No es necesario hacer nada, los botones ya están ocultos por defecto.
         }
+        btnSalirMenu?.addEventListener("click", () => document.getElementById("btnSalir")?.click()); // Conecta el salir del menú
     } 
     // --- Lógica en index.html (Página de Login) ---
     else if (window.location.pathname.endsWith("index.html") || window.location.pathname === "/") {
         const cedulaInput = document.getElementById('cedula');
         const cursoIDInput = document.getElementById('cursoID');
         const nombreInput = document.getElementById('nombre'); 
+
+        // Llenar el dropdown de cursos dinámicamente
+        if (cursoIDInput && cursoIDInput.tagName === 'SELECT') {
+            Object.keys(CURSOS_CONFIG).forEach(curso => {
+                const option = document.createElement('option');
+                option.value = curso;
+                option.textContent = curso;
+                cursoIDInput.appendChild(option);
+            });
+        }
 
         if (cedulaInput && cursoIDInput && nombreInput) {
             
@@ -679,10 +864,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             
             // Listener para el cursoID y llamar a auto-completado/limpieza
-            cursoIDInput.addEventListener('input', () => {
-                // 1. Asegurar que el cursoID sea siempre mayúsculas
-                cursoIDInput.value = cursoIDInput.value.toUpperCase();
-                
+            cursoIDInput.addEventListener('change', () => {
                 // 2. Limpiar el campo de nombre y re-validar
                 cleanNameField(); // Limpiar el nombre ANTES de la búsqueda
                 checkAndFillName(cedulaInput.value, cursoIDInput.value);

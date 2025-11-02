@@ -15,8 +15,17 @@
 <body>
   <header class="exam-title">
     <div class="contenedor-accionesUsuario">
-      <div id="accionesUsuario">
-        <button id="btnVerGrupos">Ver Grupos</button>
+      <button id="btn-menu-hamburguesa" class="menu-hamburguesa" aria-label="Abrir menú">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div id="menu-desplegable" class="menu-desplegable">
+        <button id="btnVerGruposMenu">Ver Grupos</button>
+        <button id="btnGenerarGruposMenu" class="oculto-admin">Generar Grupos</button>
+        <button id="btnBorrarMensajesMenu" class="oculto-admin">Borrar Mensajes</button>
+        <button id="btnBorrarDBMenu" class="oculto-admin">Borrar DB</button>
+        <button id="btnSalirMenu">Salir</button>
       </div>
     </div>
 
@@ -47,13 +56,6 @@
 
       <ul id="listaMensajes" class="lista-mensajes"></ul>
 
-      <section class="acciones-admin oculto-admin" id="accionesAdmin">
-        <button id="btnBorrarTodos" class="btn-borrar-todos">Borrar todos los mensajes</button>
-        <input type="number" id="personasPorGrupo" placeholder="Personas por grupo" min="1" style="display:none;">
-      </section>
-      
-      <button id="btnGenerarGrupos">Generar Grupos</button>
-
     </section>
   </main>
 
@@ -68,14 +70,14 @@
 
   <footer class="creditos">
     <div id="botonBorrarDBAbajo">
-      <button id="btnBorrarDBCompleta" class="btn-borrar-BD oculto-admin">Borrar DB</button>
+      <!-- Los botones de admin se movieron al menú de hamburguesa -->
     </div>
     
     <p id="footer-credits-text">© 2025 | Sergio Hidalgo Granados — <strong>shidalgra</strong><br>
       <em>Activando Coeficiente Intelectual</em>
     </p>
 
-    <div id="botonSalirAbajo">
+    <div id="botonSalirAbajo" class="acciones-footer">
       <button id="btnSalir">Salir</button>
     </div>
   </footer>
