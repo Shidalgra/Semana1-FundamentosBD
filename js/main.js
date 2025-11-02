@@ -458,8 +458,8 @@ async function generarGruposAleatorios() {
     try {
         const batchGuardado = db.batch();
         gruposParaGuardar.forEach(grupo => {
-            const docRef = coleccionGrupos.doc();
-            batchGuardado.set(docRef, grupo);
+            const nuevoDocRef = coleccionGrupos.doc(); // Crea una referencia con un ID nuevo y único
+            batchGuardado.set(nuevoDocRef, grupo);
         });
         await batchGuardado.commit();
 
