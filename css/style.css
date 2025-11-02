@@ -113,9 +113,14 @@ body {
 .login-box select {
     padding: 10px;
     margin-bottom: 15px;
-    border: 1px solid #004080; /* Borde consistente con el menú */
+    border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 1rem;
+}
+
+/* Estilo específico para el combo box para que coincida con el menú */
+.login-box select {
+    border: 1px solid #004080; /* Borde consistente con el menú */
     background-color: #072D4E; /* Color de fondo del menú */
     color: white; /* Color de texto del menú */
     cursor: pointer;

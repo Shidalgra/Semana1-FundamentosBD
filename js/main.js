@@ -100,7 +100,6 @@ function mostrarMensajes() {
     if (tipoUsuario === "admin") {
         document.getElementById("btnBorrarTodos")?.addEventListener("click", async () => {
             const confirm = await Swal.fire({
-                icon: "warning",
                 title: "¿Borrar TODOS los mensajes?",
                 text: `Esta acción eliminará TODOS los mensajes de la sesión **${cursoID}** y no se puede deshacer.`,
                 showCancelButton: true,
@@ -392,6 +391,10 @@ async function generarGruposAleatorios() {
         return;
     }
 
+    const coleccionGrupos = db.collection(`${cursoID}_gruposAsignados`);
+    const snapshotGruposExistentes = await coleccionGrupos.orderBy("fechaGeneracion", "desc").get();
+    const hayGruposExistentes = !snapshotGruposExistentes.empty;
+
     // --- NUEVA LÓGICA DE RE-GENERACIÓN ---
     // Si ya hay grupos, preguntar si se quiere re-generar todo o solo añadir.
     if (hayGruposExistentes) {
@@ -430,9 +433,8 @@ async function generarGruposAleatorios() {
         // Si es .isConfirmed, la función continúa con la lógica incremental normal.
     }
 
-    const coleccionGrupos = db.collection(`${cursoID}_gruposAsignados`);
     // Volvemos a obtener el estado actual por si se borraron los grupos.
-    const snapshotActualizado = await coleccionGrupos.orderBy("fechaGeneracion", "desc").get();
+    const snapshotActualizado = await db.collection(`${cursoID}_gruposAsignados`).orderBy("fechaGeneracion", "desc").get();
     const hayGruposAhora = !snapshotActualizado.empty;
 
     // 1. OBTENER PARTICIPANTES NO ASIGNADOS
@@ -623,7 +625,11 @@ async function mostrarGrupos(gruposRecibidos = null) {
             const botonMover = tipoUsuario === 'admin' 
                 ? `<button class="btn-mover-miembro" data-cedula-miembro="${m.cedula}" data-nombre-miembro="${m.nombre}" data-id-grupo-origen="${idGrupo}">🔄</button>` 
                 : '';
-            return `<li>${m.nombre} (Cédula: ${m.cedula}) ${botonMover}</li>`;
+            
+            // La cédula solo se muestra si el usuario es un administrador.
+            const cedulaHTML = tipoUsuario === 'admin' ? ` (Cédula: ${m.cedula})` : '';
+
+            return `<li>${m.nombre}${cedulaHTML} ${botonMover}</li>`;
         }).join("");
 
         div.innerHTML = `<h3>${nombreGrupo} (${miembros.length} personas)</h3><ul>${miembrosHTML}</ul>`;
@@ -642,6 +648,25 @@ async function mostrarGrupos(gruposRecibidos = null) {
 
 async function moverMiembro(evento, gruposActuales) {
     const { cedulaMiembro, nombreMiembro, idGrupoOrigen } = evento.target.dataset;
+
+    // --- VALIDACIÓN CRÍTICA ---
+    // Si solo hay un grupo (o menos), no se puede mover a nadie.
+    if (Object.keys(gruposActuales).length <= 1) {
+        const decision = await Swal.fire({
+            icon: 'info',
+            title: 'No hay a dónde mover',
+            text: 'Solo existe un grupo. Debes generar más grupos para poder mover a los miembros.',
+            showCancelButton: true,
+            confirmButtonText: 'Generar nuevos grupos',
+            cancelButtonText: 'Entendido',
+            confirmButtonColor: '#004080'
+        });
+
+        if (decision.isConfirmed) {
+            generarGruposAleatorios(); // Llama a la función para crear más grupos.
+        }
+        return; // Detiene la ejecución de la función de mover.
+    }
 
     // Crear un mapa de opciones para el dropdown de Swal
     const opcionesGrupos = {};
@@ -818,12 +843,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Conectar los botones del menú a sus funciones
             btnGenerarGruposMenu?.addEventListener("click", generarGruposAleatorios);
-            btnBorrarMensajesMenu?.addEventListener("click", borrarTodosLosMensajes); // Llama a la función directamente
+            btnBorrarMensajesMenu?.addEventListener("click", borrarTodosLosMensajes); // Conectado a la función
             btnBorrarDBMenu?.addEventListener("click", borrarTodaLaBaseDeDatos);
         } else {
             // No es necesario hacer nada, los botones ya están ocultos por defecto.
         }
-        btnSalirMenu?.addEventListener("click", () => document.getElementById("btnSalir")?.click()); // Conecta el salir del menú
+        // Conectar el botón de salir del menú directamente a la función de salir.
+        btnSalirMenu?.addEventListener("click", () => activarBotonSalir(true)); 
     } 
     // --- Lógica en index.html (Página de Login) ---
     else if (window.location.pathname.endsWith("index.html") || window.location.pathname === "/") {
