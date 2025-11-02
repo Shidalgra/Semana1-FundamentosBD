@@ -173,6 +173,9 @@ async function borrarTodaLaBaseDeDatos() {
                 console.log(`Colección ${nombreColeccion} eliminada.`);
             }
 
+            // 4. Eliminar el curso de la lista de cursos activos
+            await db.collection('_cursosActivos').doc(cursoID).delete();
+
             Swal.fire({
                 icon: 'success',
                 title: 'Borrado Exitoso',
